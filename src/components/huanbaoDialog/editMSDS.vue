@@ -10,11 +10,11 @@
       width="60%">
       <!--// msds-->
       <div class="longcheer_hr" style="margin-top: -10px;">
-        <span>原材料MSDS</span>
+        <span>{{$t('huanbaoTable.MSDS.material')}}</span>
       </div>
       <el-row v-if="showButton" style="margin-top: 10px;margin-left: 20px">
-        <el-button size="mini" type="primary" plain @click="uploadMsds">上传新文件</el-button>
-        <el-button size="mini" type="danger"  plain @click="deleteMsds">移除</el-button>
+        <el-button size="mini" type="primary" plain @click="uploadMsds">{{$t('huanbaoTable.MSDS.UploadNewFiles')}}</el-button>
+        <el-button size="mini" type="danger"  plain @click="deleteMsds">{{$t('huanbaoTable.MSDS.Remove')}}</el-button>
       </el-row>
       <el-row class="card_row">
         <el-col span="24">
@@ -45,7 +45,7 @@
               align="center"
               label="操作">
               <template slot-scope="scope">
-                <el-button @click="download(scope.row)" type="text" size="small">下载</el-button>
+                <el-button @click="download(scope.row)" type="text" size="small">{{$t('huanbaoTable.MSDS.download')}}</el-button>
               </template>
             </el-table-column>
           </el-table>
@@ -53,11 +53,11 @@
       </el-row>
       <!--// 专利证明-->
       <div class="longcheer_hr" style="margin-top: 10px;">
-        <span>专利证明</span>
+        <span>{{$t('huanbaoTable.MSDS.patentCertificate')}}</span>
       </div>
       <el-row v-if="showButton" style="margin-top: 10px;margin-left: 20px">
-        <el-button size="mini" type="primary" plain @click="uploadPatent">上传新文件</el-button>
-        <el-button size="mini" type="danger"  plain @click="deletePatent">移除</el-button>
+        <el-button size="mini" type="primary" plain @click="uploadPatent">{{$t('huanbaoTable.MSDS.UploadNewFiles')}}</el-button>
+        <el-button size="mini" type="danger"  plain @click="deletePatent">{{$t('huanbaoTable.MSDS.Remove')}}</el-button>
       </el-row>
       <el-row class="card_row">
         <el-col span="24">
@@ -88,7 +88,7 @@
               align="center"
               label="操作">
               <template slot-scope="scope">
-                <el-button @click="download(scope.row)" type="text" size="small">下载</el-button>
+                <el-button @click="download(scope.row)" type="text" size="small">{{$t('huanbaoTable.MSDS.download')}}</el-button>
               </template>
             </el-table-column>
           </el-table>
@@ -99,9 +99,9 @@
         <span>IP FORM</span>
       </div>
       <el-row v-if="showButton" style="margin-top: 10px;margin-left: 20px">
-        <el-button size="mini" type="primary" plain @click="downloadloadIP" >下载IP Form模板</el-button>
-        <el-button size="mini" type="primary" plain @click="uploadIPFORM">上传新文件</el-button>
-        <el-button size="mini" type="danger"  plain @click="deleteIPFORM">移除</el-button>
+        <el-button size="mini" type="primary" plain @click="downloadloadIP" >{{$t('huanbaoTable.MSDS.downloads')}}</el-button>
+        <el-button size="mini" type="primary" plain @click="uploadIPFORM">{{$t('huanbaoTable.MSDS.UploadNewFiles')}}</el-button>
+        <el-button size="mini" type="danger"  plain @click="deleteIPFORM">{{$t('huanbaoTable.MSDS.Remove')}}</el-button>
       </el-row>
       <el-row class="card_row">
         <el-col span="24">
@@ -132,7 +132,7 @@
               align="center"
               label="操作">
               <template slot-scope="scope">
-                <el-button @click="download(scope.row)" type="text" size="small">下载</el-button>
+                <el-button @click="download(scope.row)" type="text" size="small">{{$t('huanbaoTable.MSDS.download')}}</el-button>
               </template>
             </el-table-column>
           </el-table>
@@ -140,7 +140,7 @@
       </el-row>
       <!--// 属性-->
       <div class="longcheer_hr" style="margin-top: 10px;">
-        <span>属性</span>
+        <span>{{$t('huanbaoTable.MSDS.Attributes')}}</span>
       </div>
       <el-row class="card_row">
         <el-col span="24">
@@ -219,8 +219,10 @@ export default {
       addPatent: '',
       removePatent: '',
       addIpform: '',
-      removeIpform: ''
-
+      removeIpform: '',
+      ifRemoveMsds: 'no',
+      ifRemovePatent: 'no',
+      ifRemoveIP: 'no'
     }
   },
   methods: {
@@ -251,6 +253,9 @@ export default {
       this.ipAttachmentOid = ''
       this.path = ''
       this.fileType = ''
+      this.ifRemoveMsds = 'no'
+      this.ifRemovePatent = 'no'
+      this.ifRemoveIP = 'no'
       this.envpNumber = envpNumber
       if (action === 'edit') {
         this.showButton = true
@@ -322,6 +327,7 @@ export default {
       } */
     },
     deleteMsds () {
+      this.ifRemoveMsds = 'yes'
       var that = this
       for (let i in that.approvalTable1) {
         for (let j in that.msdsBeforeDelete) {
@@ -337,6 +343,7 @@ export default {
       })
     },
     deletePatent () {
+      this.ifRemovePatent = 'yes'
       var that = this
       for (let i in that.approvalTable2) {
         for (let j in that.patentBeforeDelete) {
@@ -359,6 +366,7 @@ export default {
       } */
     },
     deleteIPFORM () {
+      this.ifRemoveIP = 'yes'
       var that = this
       for (let i in that.approvalTable3) {
         for (let j in that.ipBeforeDelete) {
@@ -382,36 +390,38 @@ export default {
     },
     uploadPatent () {
       this.$refs.upload.openDialog()
-      this.$refs.upload.setAttribute('http://172.16.9.169:8080/files/upLoad', [], '专利证明', 'fileList', {number: this.envpNumber, userName: this.$store.getters.userInfo.username}, '03')
+      this.$refs.upload.setAttribute(this.$store.state.filePath + '/files/upLoad', [], '', 'fileList', {number: this.envpNumber, userName: this.$store.getters.userInfo.username}, '03')
     },
     uploadIPFORM () {
       this.$refs.upload.openDialog()
-      this.$refs.upload.setAttribute('http://172.16.9.169:8080/files/upLoad', [], 'IP FORM', 'fileList', {number: this.envpNumber, userName: this.$store.getters.userInfo.username}, '01')
+      this.$refs.upload.setAttribute(this.$store.state.filePath + '/files/upLoad', [], '', 'fileList', {number: this.envpNumber, userName: this.$store.getters.userInfo.username}, '01')
     },
     uploadMsds () {
       this.$refs.upload.openDialog()
-      this.$refs.upload.setAttribute('http://172.16.9.169:8080/files/upLoad', [], '原材料MSDS', 'fileList', {number: this.envpNumber, userName: this.$store.getters.userInfo.username}, '02')
+      this.$refs.upload.setAttribute(this.$store.state.filePath + '/files/upLoad', [], '', 'fileList', {number: this.envpNumber, userName: this.$store.getters.userInfo.username}, '02')
     },
     downloadloadIP () {
       downloadEnvpTemplate('IPFORM').then(r => {
         if (r.data.flag) {
-          window.open('http://172.16.9.169:8080/files/getFile?route=' + r.data.filePath + '&userName=' + this.$store.getters.userInfo.username, '_blank')
+          window.open(this.$store.state.filePath + '/files/getFile?route=' + encodeURIComponent(r.data.filePath) + '&userName=' + this.$store.getters.userInfo.username, '_blank')
         }
       })
     },
     download (row) {
       downloadAttach(row.attachmentOid).then(r => {
-        window.open('http://172.16.9.169:8080/files/getFile?route=' + r.data.filePath + '&userName=' + this.$store.getters.userInfo.username, '_blank')
+        window.open(this.$store.state.filePath + '/files/getFile?route=' + encodeURIComponent(r.data.filePath) + '&userName=' + this.$store.getters.userInfo.username, '_blank')
       })
     },
     completeMSDS () {
       this.dialogVisible = false
       var that = this
-      if (this.msdsBeforeDelete.length > 0) {
-        for (let i in this.filePathArray1) {
-          for (let j in this.msdsBeforeDelete) {
-            if (this.filePathArray1[i].fileName === this.msdsBeforeDelete[j].fileName) {
-              this.filePathArray1.splice(i, 1)
+      if (this.ifRemoveMsds === 'yes') {
+        if (this.msdsBeforeDelete.length > 0) {
+          for (let i in this.filePathArray1) {
+            for (let j in this.msdsBeforeDelete) {
+              if (this.filePathArray1[i].fileName === this.msdsBeforeDelete[j].fileName) {
+                this.filePathArray1.splice(i, 1)
+              }
             }
           }
         }
@@ -419,11 +429,13 @@ export default {
       that.filePathArray1.forEach(function (value, index) {
         that.addMsds += value.filePath + '@@@'
       })
-      if (this.patentBeforeDelete.length > 0) {
-        for (let i in this.filePathArray2) {
-          for (let j in this.patentBeforeDelete) {
-            if (this.filePathArray2[i].fileName === this.patentBeforeDelete[j].fileName) {
-              this.filePathArray2.splice(i, 1)
+      if (this.ifRemovePatent === 'yes') {
+        if (this.patentBeforeDelete.length > 0) {
+          for (let i in this.filePathArray2) {
+            for (let j in this.patentBeforeDelete) {
+              if (this.filePathArray2[i].fileName === this.patentBeforeDelete[j].fileName) {
+                this.filePathArray2.splice(i, 1)
+              }
             }
           }
         }
@@ -431,11 +443,13 @@ export default {
       that.filePathArray2.forEach(function (value, index) {
         that.addPatent += value.filePath + '@@@'
       })
-      if (this.ipBeforeDelete.length > 0) {
-        for (let i in this.filePathArray3) {
-          for (let j in this.ipBeforeDelete) {
-            if (this.filePathArray3[i].fileName === this.ipBeforeDelete[j].fileName) {
-              this.filePathArray3.splice(i, 1)
+      if (this.ifRemoveIP === 'yes') {
+        if (this.ipBeforeDelete.length > 0) {
+          for (let i in this.filePathArray3) {
+            for (let j in this.ipBeforeDelete) {
+              if (this.filePathArray3[i].fileName === this.ipBeforeDelete[j].fileName) {
+                this.filePathArray3.splice(i, 1)
+              }
             }
           }
         }
@@ -447,13 +461,16 @@ export default {
         if (r.data.status === 'success') {
           this.$props.updateMSDSData()
           this.$message.success({
-            message: '修改成功'
+            message: this.$t('success.update_success')
           })
         } else {
           this.$message.error({
             message: r.data.info
           })
         }
+        this.ifRemoveMsds = 'no'
+        this.ifRemovePatent = 'no'
+        this.ifRemoveIP = 'no'
       })
     },
     returnFilePath (e, type) {
@@ -466,8 +483,8 @@ export default {
             fileName: e[i].name
           })
           this.filePathArray1.push({
-            filePath: e[0].response.data[0],
-            fileName: e[0].name,
+            filePath: e[i].path,
+            fileName: e[i].name,
             fileType: '02'
           })
         }
@@ -478,8 +495,8 @@ export default {
             fileName: e[i].name
           })
           this.filePathArray2.push({
-            filePath: e[0].response.data[0],
-            fileName: e[0].name,
+            filePath: e[i].path,
+            fileName: e[i].name,
             fileType: '03'
           })
         }
@@ -490,8 +507,8 @@ export default {
             fileName: e[i].name
           })
           this.filePathArray3.push({
-            filePath: e[0].response.data[0],
-            fileName: e[0].name,
+            filePath: e[i].path,
+            fileName: e[i].name,
             fileType: '01'
           })
         }
@@ -518,8 +535,8 @@ export default {
     background-image: url(../../assets/image/tab2.png);
     background-repeat: no-repeat;
     background-size: 95% 100%;
-    width: 200px;
-    padding: 5px 15px;
+    padding: 5px 30px 0px 15px;
+    width: auto;
     height: 27px;
     color: #ffffff;
   }

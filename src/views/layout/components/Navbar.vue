@@ -4,7 +4,7 @@
     <breadcrumb class="breadcrumb-container"></breadcrumb>
     <el-dropdown class="avatar-container" trigger="click">
       <div class="avatar-wrapper">
-        <img :title="loginName" class="user-avatar" :src="avatarImage">
+        <img :title="loginName" class="user-avatar" src="../../../assets/image/userDefualt.jpg">
         <i :title="loginName" class="el-icon-caret-bottom"></i>
       </div>
       <el-dropdown-menu class="user-dropdown" slot="dropdown">
@@ -16,8 +16,8 @@
         <el-dropdown-item divided>
           <span  @click="changePdUI" style="display:block;">{{$t('m.editUserInfo')}}</span>
         </el-dropdown-item>
-        <el-dropdown-item divided>
-          <span  @click="goNotice" style="display:block;">{{$t('m.Notice')}}</span>
+        <el-dropdown-item divided v-if="websiteType !== '外发'">
+          <span   @click="goNotice" style="display:block;">{{$t('m.Notice')}}</span>
         </el-dropdown-item>
         <el-dropdown-item divided>
           <span @click="logout" style="display:block;">{{$t('m.Logout')}}</span>
@@ -25,6 +25,7 @@
       </el-dropdown-menu>
     </el-dropdown>
     <userInfoEdit ref="userinfoDialog"></userInfoEdit>
+    <user-info ref="userInfo"></user-info>
   </el-menu>
 </template>
 
@@ -38,8 +39,10 @@ import waves from '@/directive/waves'
 // import user from '@/store/modules/user'
 // import user from '@/store/modules/user'
 import userInfoEdit from '../../../components/UserInfoEdit/index'
+import UserInfo from '../../../components/UserInfoEdit/userInfo'
 export default {
   components: {
+    UserInfo,
     Breadcrumb,
     Hamburger,
     userInfoEdit
@@ -71,7 +74,7 @@ export default {
     return {
       loginName: '',
       textMap: '',
-      avatarImage: 'https://pic.qqtn.com/up/2014-7/14065364718533842.gif',
+      avatarImage: '../../../assets/image/userDefualt.png',
       dialogFormVisibledialogFormVisible: false,
       users: [],
       changePassword: {
@@ -91,7 +94,8 @@ export default {
         confirmPassword: [
           { validator: validatePass2, required: true, trigger: 'blur' }
         ]
-      }
+      },
+      websiteType: ''
     }
   },
   mounted: function () {
@@ -103,6 +107,7 @@ export default {
     }
   },
   created () {
+    this.websiteType = this.$store.getters.websiteType
     this.UserCode = Cookies.get('UserCode')
     this.initUsetInfo()
   },
@@ -126,12 +131,21 @@ export default {
       location.reload()
     },
     goNotice () {
-      window.open('http://plmtest.longcheer.com/Windchill/ptc1/ext/longcheer/helpDoc/helpDocSS', '_blank')
+      // var path = this.$store.getters.guojihua === 'zh' ? '公告.docx' : 'Notice.docx'
+      // path = 'dev/plmsupplierfiles/files/' + path
+      // window.open(this.$store.state.filePath + '/files/getFile?route=' + encodeURI(path) + '&userName=' + this.$store.getters.userInfo.username, '_blank')
+      // window.location.href = '../../../gongao.vue'
+      let routeData = this.$router.resolve({
+        path: '/gongao'
+      })
+      window.open(routeData.href, '_blank')
     },
     changePdUI () {
-      // this.textMap = '修改密码'
-      // this.dialogFormVisible = true
-      this.$refs.userinfoDialog.dialogVisibleChange(true)
+      if (this.websiteType === '外发') {
+        this.$refs.userInfo.userInfoDialogVisible(true)
+      } else {
+        this.$refs.userinfoDialog.dialogVisibleChange(true)
+      }
     },
     changePd (formName) {
       this.$refs[formName].validate((valid) => {

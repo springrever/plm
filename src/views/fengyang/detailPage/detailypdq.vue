@@ -99,7 +99,7 @@
               {{$t('fengyangTable.detail.approveddate')}}:
             </el-col>
             <el-col :span="7" class="card_value">&nbsp;
-              {{model.approveddate}}
+              <span style="color: red">{{model.approveddate}}</span>
             </el-col>
             <el-col :span="4" class="card_lable">
               {{$t('fengyangTable.detail.lq_supplier_rank')}}:
@@ -210,7 +210,7 @@
             <span class="longcheer_hr_span">{{$t('formButton.Approval')}}</span>
           </div>
           <el-row v-if="state === 'true'" class="card_row">
-            <el-col span="4" style="text-align: right">备注：</el-col>
+            <el-col span="4" style="text-align: right">{{$t('supplement.fengyang.remark')}}：</el-col>
             <el-col span="1" style="text-align: right">&nbsp;</el-col>
             <el-col  span="12"><el-input v-model="model.comment" :disabled="state !== 'true'" type="textarea" :rows="3"></el-input></el-col>
           </el-row>
@@ -343,18 +343,18 @@ export default {
     },
     submitAprive () {
       this.$store.commit('SET_LOADING', true)
-      completeSealedTask(this.oid, this.model.comment, this.radio).then(r => {
-        console.log(r)
-        if (r.data.mes.indexOf('成功') !== -1) {
+      completeSealedTask('MS' + this.model.materialNumber, this.model.comment, this.radio).then(r => {
+        var mesg = this.$store.getters.guojihua === 'zh' ? r.data.zh : r.data.en
+        if (r.data.state !== 'failed') {
           this.$message({
-            message: this.$t('success.finsh_task_success'),
+            message: mesg,
             type: 'success',
             duration: 5 * 1000
           })
           this.closePage()
         } else {
           this.$message({
-            message: r.data.mes,
+            message: mesg,
             type: 'warning',
             duration: 5 * 1000
           })
@@ -392,7 +392,7 @@ export default {
   }
 }
 </script>
-<style>
+<style scoped>
   .card_title{
     font-weight: bold;
     padding-bottom: 20px;
@@ -429,8 +429,8 @@ export default {
     background-image: url(../../../assets/image/tab2.png);
     background-repeat: no-repeat;
     background-size: 95% 100%;
-    width: 120px;
-    padding: 5px 15px;
+    padding: 5px 30px 0px 15px;
+    width: auto;
     height: 27px;
     color: #ffffff;
   }

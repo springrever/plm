@@ -42,13 +42,14 @@
                       :label="item.label"
                       :value="item.value">
                     </el-option>
-                  </el-select></el-form-item>
+                  </el-select>
+                </el-form-item>
               </el-col>
             </el-row>
             <el-row style="padding-left: 10px">
               <el-col span=" 10">
-                <el-form-item label="模板下载" prop="explain">
-                  【<a style="color: blue" @click="downloadModel">点击下载模板</a>】
+                <el-form-item :label="$t('supplement.fengyang.Template_Download')" prop="explain">
+                  【<a style="color: blue" @click="downloadModel">{{$t('supplement.fengyang.Template_Download')}}</a>】
                 </el-form-item>
               </el-col>
             </el-row>
@@ -58,14 +59,14 @@
             <el-row style="padding-left: 10px">
               <el-col span="24">
                 <el-button-group>
-                  <el-button size="mini" :loading="$store.getters.loading" icon="el-icon-plus" @click="filesUploadClick">上传文件</el-button>
+                  <el-button size="mini" :loading="$store.getters.loading" icon="el-icon-plus" @click="filesUploadClick">{{$t('supplement.fengyang.UploadFiles')}}</el-button>
                   <el-button size="mini" :loading="$store.getters.loading" icon="el-icon-delete" @click="removeRelatedWLFYDocs">{{$t('fengyangTable.detail.remove')}}</el-button>
                   <el-table
                     size="mini"
                     :data="filesList"
                     border
                     ref="multipleTable"
-                    height="200px"
+                    :height="filesList.length === 0 ? '100': '200'"
                     @selection-change="handleSelectionChange"
                     style="width: 100%">
                     <el-table-column
@@ -73,7 +74,7 @@
                       type="selection"
                       width="55">
                     </el-table-column>
-                    <el-table-column   align="center" :show-overflow-tooltip="true"   prop="number"  label="标签或文件名" width="650">
+                    <el-table-column   align="center" :show-overflow-tooltip="true"   prop="number"  :label="$t('supplement.fengyang.LabelOrFilename')" width="650">
                       <template
                         slot-scope="scope">
                         {{$t(scope.row.name)}}
@@ -118,14 +119,14 @@ export default {
       // http://172.17.122.121:8081/files/upLoad
       // http://172.17.1.125:8081/files/upLoad
       // http://172.16.9.169:8080/files/upLoad
-      this.$refs.fup.setAttribute('http://172.16.9.169:8080/files/upLoad', [], '', 'fileList', {number: this.materialNumber, userName: this.$store.getters.userInfo.username})
+      this.$refs.fup.setAttribute(this.$store.state.filePath + '/files/upLoad', [], '', 'fileList', {number: this.materialNumber, userName: this.$store.getters.userInfo.username})
     },
     returnFilePath (data) {
       console.log('xxoo', data)
       var that = this
       data.forEach(function (value, index) {
-        // that.filePath += value.response.data[0] + ';'
-        var path = value.response.data[0]
+        // that.filePath += value.response.data[0] + ';' var path = value.path
+        var path = value.path
         that.submitPath = that.submitPath + path + ';'
         that.filesList.push({name: value.name, filepath: path, url: '', desc: '', ftype: 'new'})
         that.updatefielsList.push({name: value.name, filepath: path, url: '', desc: '', ftype: 'new'})
@@ -176,7 +177,7 @@ export default {
             that.removeList.push(value)
           } else {
             that.$message({
-              message: '移除成功',
+              message: that.$t('success.remove_success'),
               type: 'success',
               duration: 5 * 1000
             })
@@ -258,9 +259,10 @@ export default {
     onEditWLFYDoc () {
       editWLFYDoc(this.model.number, this.submitPath, this.model.lq_third_level, this.model.explain).then(r => {
         console.log(r)
-        if (r.data.mes.indexOf('成功') !== -1) {
+        var mesg = this.$store.getters.guojihua === 'zh' ? r.data.zh : r.data.en
+        if (r.data.state === 'success') {
           this.$message({
-            message: this.$t('success.update_success'),
+            message: mesg,
             type: 'success',
             duration: 5 * 1000
           })
@@ -268,7 +270,7 @@ export default {
           this.updatedialogFlag = false
         } else {
           this.$message({
-            message: r.data.mes,
+            message: mesg,
             type: 'warning',
             duration: 5 * 1000
           })
@@ -278,9 +280,10 @@ export default {
     oncreateWLFYDoc () {
       createWLFYDoc('MS' + this.model.materialNumber, this.model.lq_third_level, this.model.explain, this.submitPath).then(r => {
         console.log(r)
-        if (r.data.mes.indexOf('成功') !== -1) {
+        var mesg = this.$store.getters.guojihua === 'zh' ? r.data.zh : r.data.en
+        if (r.data.state === 'success') {
           this.$message({
-            message: this.$t('success.create_success'),
+            message: mesg,
             type: 'success',
             duration: 5 * 1000
           })
@@ -288,7 +291,7 @@ export default {
           this.updatedialogFlag = false
         } else {
           this.$message({
-            message: r.data.mes,
+            message: mesg,
             type: 'warning',
             duration: 5 * 1000
           })
@@ -315,7 +318,7 @@ export default {
     downloadModel () {
       attachmentLink('', '封样模板').then(r => {
         console.log(r)
-        window.open('http://172.16.9.169:8080/files/getFile?route=' + r.data.filePath + '&userName=' + this.$store.getters.userInfo.username, '_blank')
+        window.open(this.$store.state.filePath + '/files/getFile?route=' + encodeURIComponent(r.data.filePath) + '&userName=' + this.$store.getters.userInfo.username, '_blank')
       })
     }
   },
@@ -336,7 +339,7 @@ export default {
   }
 }
 </script>
-<style>
+<style scoped>
   .longcheer_hr{
     padding: 0;
     background-color: transparent;

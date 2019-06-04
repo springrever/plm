@@ -7,6 +7,7 @@ export const constantRouterMap = [
   { path: '/login', component: () => import('@/views/login/index'), hidden: true },
   { path: '/reset', component: () => import('@/views/login/reset'), hidden: true },
   { path: '/404', component: () => import('@/views/404'), hidden: true },
+  { path: '/gongao', component: () => import('@/views/gongao'), hidden: true },
   {
     path: '',
     component: Layout,
@@ -83,7 +84,7 @@ export const asyncRouterMap = [
       path: 'submitted',
       component: () => import('@/views/huanbao/Material_submitted'),
       name: 'submitted',
-      meta: { title: 'huanbaoRoute.Material_submitted', icon: 'issue', noCache: true }
+      meta: { title: 'huanbaoRoute.Material_submitted', icon: 'dtj', noCache: true }
     }]
   },
   {
@@ -95,7 +96,7 @@ export const asyncRouterMap = [
       path: 'third',
       component: () => import('@/views/huanbao/third'),
       name: 'third',
-      meta: { title: 'huanbaoRoute.third_report', icon: 'user', noCache: true }
+      meta: { title: 'huanbaoRoute.third_report', icon: 'fydq3', noCache: true }
     }]
   },
   {
@@ -107,7 +108,7 @@ export const asyncRouterMap = [
       path: 'search',
       component: () => import('@/views/huanbao/Material_Search'),
       name: 'search',
-      meta: { title: 'huanbaoRoute.Material_Search', icon: 'dashboard', noCache: true }
+      meta: { title: 'huanbaoRoute.Material_Search', icon: 'fsearch', noCache: true }
     }]
   },
   {
@@ -196,6 +197,30 @@ export const asyncRouterMap = [
       component: () => import('@/views/PCN/edit_pcn'),
       name: 'editPcn',
       meta: { title: 'pcn.title.rejectPcn', icon: 'rejectpcn' }
+    }]
+  },
+  {
+    path: '/download',
+    component: Layout,
+    redirect: '/download',
+    meta: { title: 'OUTRESOURCE.tittle.out', icon: 'dtj' },
+    children: [{
+      path: 'download',
+      component: () => import('@/views/resource/download'),
+      name: 'download',
+      meta: { title: 'OUTRESOURCE.tittle.out', icon: 'dtj' }
+    }]
+  },
+  {
+    path: '/outsearch',
+    component: Layout,
+    redirect: '/outsearch',
+    meta: { title: 'OUTRESOURCE.tittle.search', icon: 'fsearch' },
+    children: [{
+      path: 'outsearch',
+      component: () => import('@/views/resource/outsearch'),
+      name: 'outsearch',
+      meta: { title: 'OUTRESOURCE.tittle.search', icon: 'fsearch' }
     }]
   },
   { path: '*', redirect: '/404', hidden: true }

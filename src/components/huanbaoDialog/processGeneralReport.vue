@@ -11,15 +11,15 @@
       top="15%"
       append-to-body>
       <div class="longcheer_hr" style="margin-top: -10px;">
-        <span>属性</span>
+        <span>{{$t('huanbaoTable.MSDS.Attributes')}}</span>
       </div>
       <el-row :gutter="20" >
         <el-col :span="24">
-          <el-form size="mini" ref="dataForm" :model="temp" :rules="rules" label-position="left" label-width="100px"
+          <el-form size="mini" ref="dataForm" :model="temp" :rules="rules" label-position="left" label-width="180px"
                    style=' margin-left:0px;' >
             <el-row v-if="itemCategory === 'OTHER' && this.type !== 'TOTAL'" :gutter="100" type="flex" class="row-bg" style="height: 40px;margin-left: 20px;margin-top: 10px">
               <el-col :span="16">
-                <el-form-item prop="materialGroup" label="报告类型">
+                <el-form-item prop="materialGroup" :label="$t('huanbaoTable.OTHER.Reporttype')">
                   <el-select v-model="value" multiple  placeholder="" style="width: 100%">
                     <el-option
                       v-for="item in options2"
@@ -37,7 +37,7 @@
             </el-row>
             <el-row :gutter="100" type="flex" class="row-bg" style="height: 40px;margin-left: 20px;margin-top: 10px">
               <el-col :span="16">
-                <el-form-item prop="rohsReportDateValue" label="报告日期">
+                <el-form-item prop="rohsReportDateValue" :label="$t('huanbaoTable.ROHS.reportDate')">
                   <el-date-picker
                     v-model="rohsReportDateValue"
                     style="width: 100%"
@@ -56,7 +56,7 @@
             </el-row>
             <el-row :gutter="100" type="flex" class="row-bg" style="height: 40px;margin-left: 20px;margin-top: 10px">
               <el-col :span="16">
-                <el-form-item prop="reportNumber" label="报告编号">
+                <el-form-item prop="reportNumber" :label="$t('huanbaoTable.ROHS.reportNumber')">
                   <el-input v-model="temp.reportNumber"></el-input>
                 </el-form-item>
               </el-col>
@@ -67,7 +67,7 @@
             </el-row>
             <el-row :gutter="100" type="flex" class="row-bg" style="height: 40px;margin-left: 20px;margin-top: 10px">
               <el-col :span="16">
-                <el-form-item prop="examUnit" label="检测单位">
+                <el-form-item prop="examUnit" :label="$t('huanbaoTable.ROHS.examUnit')">
                   <el-select v-model="temp.examUnit" placeholder="" style="width: 100%">
                     <el-option
                       v-for="item in options"
@@ -85,8 +85,8 @@
             </el-row>
             <el-row :gutter="100" type="flex" class="row-bg" style="height: 40px;margin-left: 20px;margin-top: 10px">
               <el-col :span="20">
-                <el-form-item prop="manufacturer" label="报告">
-                  <el-button size="mini" type="primary" plain @click="choseFile" >选择文件</el-button>
+                <el-form-item prop="manufacturer" :label="$t('huanbaoTable.FMD.REPORT')">
+                  <el-button size="mini" type="primary" plain @click="choseFile" >{{$t('huanbaoTable.FMD.Selectfile')}}</el-button>
                   <el-input :disabled="true" v-model="fileName"></el-input>
                 </el-form-item>
               </el-col>
@@ -185,9 +185,10 @@ export default {
           if (this.category === 'EDIT') {
             var v = []
             v = this.temp.reportType.split('\n')
-            this.value = v.slice(0, -1)
+            this.value = v
           }
-          reportType(this.oid).then(r => {
+          var types = this.$store.getters.guojihua === 'zh' ? 'Chinese' : 'English'
+          reportType(this.oid, types).then(r => {
             for (let i in r.data) {
               this.options2.push({
                 label: r.data[i].name,
@@ -201,7 +202,7 @@ export default {
     },
     choseFile () {
       this.$refs.fileUpload.openDialog()
-      this.$refs.fileUpload.setAttribute('http://172.16.9.169:8080/files/upLoad', [], '添加报告', 'fileList', {
+      this.$refs.fileUpload.setAttribute(this.$store.state.filePath + '/files/upLoad', [], this.$t('huanbaoTable.detailTable.addReport'), 'fileList', {
         number: this.$store.getters.huanbaoNum,
         userName: this.$store.getters.userInfo.username
       }, this.itemCategory)
@@ -218,8 +219,8 @@ export default {
           if (this.type === 'TOTAL') {
             // 判断是否选择文件
             if (this.fileName === '') {
-              this.$alert('请选择文件', '提示', {
-                confirmButtonText: '确定',
+              this.$alert(this.$t('huanbaoTable.detailTable.selectFile'), this.$t('huanbaoTable.detailTable.prompt'), {
+                confirmButtonText: this.$t('huanbaoTable.escapeClause.ensure'),
                 callback: action => {
                   this.$store.commit('SET_LOADING', false)
                 }
@@ -260,8 +261,8 @@ export default {
             }
           } else {
             if (this.fileName === '') {
-              this.$alert('请选择文件', '提示', {
-                confirmButtonText: '确定',
+              this.$alert(this.$t('huanbaoTable.detailTable.selectFile'), this.$t('huanbaoTable.detailTable.prompt'), {
+                confirmButtonText: this.$t('huanbaoTable.escapeClause.ensure'),
                 callback: action => {
                   this.$store.commit('SET_LOADING', false)
                 }
@@ -310,20 +311,21 @@ export default {
     },
     // 编辑报告
     editReport (num, type) {
-      editReport(this.temp, num, this.filePath).then(r => {
+      var types = this.$store.getters.guojihua === 'zh' ? 'Chinese' : 'English'
+      editReport(this.temp, num, this.filePath, types).then(r => {
         if (r.data.status === 'success') {
           this.ProcessingGeneralReportDialog = false
           this.temp.reportOid = r.data.add
           this.$props.getBABAData(this.oid, type, r.data, this.temp)
           if (r.data.hasOwnProperty('warn')) {
-            this.$message.success({
+            this.$message.warning({
               dangerouslyUseHTMLString: true,
-              message: '<title>编辑成功</title><strong><i>' + r.data.warn + '</i></strong>'
+              message: r.data.warn
             })
           } else {
             this.$message.success({
               dangerouslyUseHTMLString: true,
-              message: '编辑成功'
+              message: this.$t('success.create_success')
             })
           }
         } else {
@@ -334,20 +336,21 @@ export default {
     },
     // 添加报告
     addReport (num, type) {
-      addReport(this.oid, this.temp, num, type, this.filePath).then(r => {
+      var types = this.$store.getters.guojihua === 'zh' ? 'Chinese' : 'English'
+      addReport(this.oid, this.temp, num, type, this.filePath, types).then(r => {
         if (r.data.status === 'success') {
           this.ProcessingGeneralReportDialog = false
           this.temp.reportOid = r.data.add
           this.$props.getBABAData(this.oid, type, r.data, this.temp)
           if (r.data.hasOwnProperty('warn')) {
-            this.$message.success({
+            this.$message.warning({
               dangerouslyUseHTMLString: true,
-              message: '<title>编辑成功</title><strong><i>' + r.data.warn + '</i></strong>'
+              message: r.data.warn
             })
           } else {
             this.$message.success({
               dangerouslyUseHTMLString: true,
-              message: '编辑成功'
+              message: this.$t('success.create_success')
             })
           }
         } else {
@@ -360,7 +363,7 @@ export default {
       this.$refs.fileUpload.closeDialog()
       this.fileName = e[0].name
       this.fileType = type
-      this.filePath = e[0].response.data[0]
+      this.filePath = e[0].path
     }
   }
 }

@@ -1,5 +1,4 @@
 import Cookies from 'js-cookie'
-import { showSealedSampleTasks, expiredSealedSampleTasks, showEnvProtectionTasks } from '@/api/index'
 
 const app = {
   state: {
@@ -12,10 +11,22 @@ const app = {
     fengyangdaoqiNum: -1,
     huanbaoNum: '',
     device: 'desktop',
-    guojihua: localStorage.getItem('guojihua') || 'zh',
-    loading: false
+    guojihua: sessionStorage.getItem('guojihua') === null ? 'zh' : sessionStorage.getItem('guojihua') || 'zh',
+    loading: false,
+    baseUrl: '',
+    filesPath: '',
+    websiteType: ''
   },
   mutations: {
+    SET_BASEURL: (state, baseUrl) => {
+      state.baseUrl = baseUrl
+    },
+    SET_FILESPATH: (state, filesPath) => {
+      state.filesPath = filesPath
+    },
+    SET_WEBSITETYPE: (state, websiteType) => {
+      state.websiteType = websiteType
+    },
     SET_FENGYANGDAOQINUM: (state, fengyangdaoqiNum) => {
       state.fengyangdaoqiNum = fengyangdaoqiNum
     },
@@ -32,7 +43,7 @@ const app = {
       state.loading = loading
     },
     SET_GUOJIHUA: (state, guojihua) => {
-      localStorage.setItem('guojihua', guojihua)
+      sessionStorage.setItem('guojihua', guojihua)
       state.guojihua = guojihua
     },
     TOGGLE_SIDEBAR: state => {
@@ -64,7 +75,7 @@ const app = {
       commit('TOGGLE_DEVICE', device)
     },
     getNum ({ commit }) {
-      showSealedSampleTasks().then(r => {
+      /* showSealedSampleTasks().then(r => {
         commit('SET_FENGYANGTASKNUM', r.data.length)
       })
       expiredSealedSampleTasks().then(r => {
@@ -72,7 +83,7 @@ const app = {
       })
       showEnvProtectionTasks().then(r => {
         commit('SET_HUANBAOTASKNUM', r.data.length)
-      })
+      }) */
     }
   }
 }

@@ -144,8 +144,16 @@ export default {
       unSupply: '不供货',
       remark: '备注',
       complete: '完成任务',
-      approval: '审批日志',
-      third: '过期第三方报告'
+      approvals: '审批日志',
+      third: '过期第三方报告',
+      approval: '审批',
+      approvalComments: '审批意见',
+      operating: '操作',
+      fileUpload: '文件上传',
+      uploadData: '上传数据',
+      addReport: '添加报告',
+      selectFile: '请选择文件',
+      prompt: '提示'
     },
     approval: {
       false: '未完成',
@@ -181,7 +189,7 @@ export default {
       materialGroup: '原材料组',
       manufacturer: '原材料制造商',
       subMaterialName: '子物质名称',
-      casNo: 'casNo',
+      casNo: 'CAS No.',
       substanceWeight: '子物质重量',
       contentRate: '含有率',
       exemptions: '豁免条款',
@@ -189,36 +197,47 @@ export default {
       RELEASED: '已发布',
       REWORK: '驳回',
       UNDERREVIEW: '正在审阅',
-      INWORK: '正在工作'
+      INWORK: '正在工作',
+      Relatedmaterials: '相关物料',
+      Reusable: '可复用的MSDS和申报物质报告',
+      REPORT: '报告',
+      Selectfile: '添加文件'
     },
     MSDS: {
       fileName: '文件名',
       endTime: '上次修改时间',
       materialName: '原材料名称',
       manufacturer: '原材料制造商',
-      ipForm: 'Ipform',
+      ipForm: 'IP Form',
       msds: '原材料MSDS',
       patentCert: '专利证明',
       state: '状态',
       RELEASED: '已发布',
       REWORK: '驳回',
       UNDERREVIEW: '正在审阅',
-      INWORK: '正在工作'
+      INWORK: '正在工作',
+      material: '原材料MSDS',
+      patentCertificate: '专利证明',
+      Attributes: '属性',
+      UploadNewFiles: '上传新文件',
+      Remove: '移除',
+      downloads: '下载IP Form模板',
+      download: '下载'
     },
     ROHS: {
       materialName: '原材料名称',
       materialGroup: '原材料组',
       manufacturer: '原材料制造商',
-      pb: 'pb',
-      cd: 'cd',
-      hg: 'hg',
-      cr6p: 'cr6p',
-      pbbs: 'pbbs',
-      pbdes: 'pbdes',
-      dehp: 'dehp',
-      bbp: 'bbp',
-      dbp: 'dbp',
-      dibp: 'dibp',
+      pb: 'Pb',
+      cd: 'Cd',
+      hg: 'Hg',
+      cr6p: 'Cr6+',
+      pbbs: 'PBBs',
+      pbdes: 'PBDEs',
+      dehp: 'DEHP',
+      bbp: 'BBP',
+      dbp: 'DBP',
+      dibp: 'DIBP',
       exemptions: '豁免条款',
       reportName1: 'RoHS报告',
       examUnit: '检测单位',
@@ -229,14 +248,21 @@ export default {
       RELEASED: '已发布',
       REWORK: '驳回',
       UNDERREVIEW: '正在审阅',
-      INWORK: '正在工作'
+      INWORK: '正在工作',
+      download: '下载导入模板',
+      Upload: '上传环保数据',
+      editGeneralReport: '编辑RoHS总报告',
+      viewGeneralReport: '查看RoHS总报告',
+      lastTime: '上次修改时间',
+      report: 'RoHS报告',
+      remark: '备注'
     },
     HF: {
       materialName: '原材料名称',
       manufacturer: '原材料制造商',
-      cl: 'cl',
-      br: 'br',
-      clBr: 'clBr',
+      cl: 'Cl',
+      br: 'Br',
+      clBr: 'Cl+Br',
       fileRetardant: '是否阻燃剂',
       reportCount: 'HF报告',
       reportDate: '报告日期',
@@ -245,7 +271,12 @@ export default {
       RELEASED: '已发布',
       REWORK: '驳回',
       UNDERREVIEW: '正在审阅',
-      INWORK: '正在工作'
+      INWORK: '正在工作',
+      report: 'HF报告',
+      yes: '是',
+      no: '否',
+      editGeneralReport: '编辑HF总报告',
+      viewGeneralReport: '查看HF总报告'
     },
     REACH: {
       materialName: '原材料名称',
@@ -259,19 +290,28 @@ export default {
       RELEASED: '已发布',
       REWORK: '驳回',
       UNDERREVIEW: '正在审阅',
-      INWORK: '正在工作'
+      INWORK: '正在工作',
+      editGeneralReport: '编辑REACH总报告',
+      viewGeneralReport: '查看REACH总报告',
+      Editstatement: '编辑REACH总声明',
+      Viewstatement: '查看REACH总声明',
+      statement: 'REACH总声明',
+      REACH: 'REACH报告',
+      downloads: '下载报告模板'
     },
     OTHER: {
+      editGeneralReport: '编辑其他总报告',
+      viewGeneralReport: '查看其他总报告',
       materialName: '原材料名称',
       manufacturer: '原材料制造商',
-      ni: 'ni',
-      pahs: 'pahs',
-      didp: 'didp',
-      dinp: 'dinp',
-      dnhp: 'dnhp',
-      sccp: 'sccp',
-      be: 'be',
-      sb: 'sb',
+      ni: 'Ni',
+      pahs: 'PAHs',
+      didp: 'DIDP',
+      dinp: 'DINP',
+      dnhp: 'DnHP',
+      sccp: 'SCCP',
+      be: 'Be',
+      sb: 'Sb',
       reportCount: '报告',
       reportDate: '报告日期',
       reportNumber: '报告编号',
@@ -279,7 +319,13 @@ export default {
       RELEASED: '已发布',
       REWORK: '驳回',
       UNDERREVIEW: '正在审阅',
-      INWORK: '正在工作'
+      INWORK: '正在工作',
+      OTHER: '其他报告',
+      AddSubstance: '添加新物质',
+      MaterialName: '物质名称',
+      substanceWeight: '物质重量',
+      Reporttype: '报告类型',
+      substance: '其他物质含量'
     },
     OTHER2: {
       fileName: '文件名',
@@ -289,7 +335,10 @@ export default {
       RELEASED: '已发布',
       REWORK: '驳回',
       UNDERREVIEW: '正在审阅',
-      INWORK: '正在工作'
+      INWORK: '正在工作',
+      specialneeds: '编辑客户特殊需求申报',
+      SONYinformation: 'SONY项目必交资料',
+      Lenovoinformation: 'Lenovo项目必交资料'
     }
   },
   tagsView: {
@@ -301,7 +350,7 @@ export default {
     music: '音乐',
     login: '登录',
     zdsc: '自动生成',
-    loginTitle: '环保封样系统',
+    loginTitle: '龙旗封样环保系统',
     homepage: '首页',
     Logout: '注销',
     back_home: '返回首页',
@@ -345,7 +394,8 @@ export default {
     INWORK: '正在工作',
     SAMPLE_EXPIRE: '封样到期',
     UNDERREVIEW: '正在审阅',
-    RELEASED: '发布'
+    RELEASED: '发布',
+    CANCELLED: '已取消'
   },
   formButton: {
     cancel: '取消',
@@ -446,7 +496,7 @@ export default {
       'CP_Seq': 'CP',
       'CLCFB_ID_Seq': '材料成分表',
       'RZZS_ID_Seq': '3C认证证书',
-      'YPBGLLB_ID_Seq': '样品变更覆历表',
+      'YPBGLLB_ID_Seq': '样品变更履历表',
       'FM_ID_Seq': '封面',
       'PLSCLLBG_ID_Seq': '批量生产良率报告',
       'WLBOMO_ID_Seq': '物料BOM清单',
@@ -489,6 +539,7 @@ export default {
       information: '基本信息'
     },
     form: {
+      comment: '驳回审批意见',
       ChangeType: '变更类型',
       Name: '名称',
       project: '项目',
@@ -504,6 +555,9 @@ export default {
       userName: '拼音'
     },
     table: {
+      ResubmitPCN: '重新提交PCN',
+      pg_number: '变更单号',
+      pg_name: '变更名称',
       ChangeType: '变更类型',
       number: '编号',
       Name: '名称',
@@ -513,6 +567,57 @@ export default {
       state: '状态'
     },
     select: {
+      state: {
+        OPEN: '开启',
+        UNDERREVIEW: '正在审阅',
+        REWORK: '驳回',
+        RESOLVED: '已解决',
+        CANCELLED: '已取消'
+      }
+    }
+  },
+  supplement: {
+    fengyang: {
+      downExcel: '生成的承认书EXCEL附件',
+      Template_Download: '模板下载',
+      Template_click_down: '点击下载模板',
+      UploadFiles: '上传文件',
+      LabelOrFilename: '标签或文件名',
+      remark: '备注',
+      download: '下载',
+      file: '文件'
+    }
+  },
+  OUTRESOURCE: {
+    tittle: {
+      out: '我的待下载资料',
+      search: '所有资料查询'
+    },
+    userInfo: {
+      account: '账号',
+      password: '密码',
+      fullname: '姓名',
+      mail: '邮箱',
+      mobile: '固定电话',
+      tel: '移动电话',
+      unit: '所属单位',
+      group: '所在组'
+    },
+    download: {
+      number: '单号',
+      name: '名称',
+      project: '项目',
+      date: '发布日期',
+      person: '发布人',
+      option: '操作',
+      situation: '情况',
+      down: '下载',
+      ifdown: '未下载',
+      downs: '已下载'
+    },
+    search: {
+      result: '搜索结果'
     }
   }
+
 }

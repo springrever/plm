@@ -14,12 +14,19 @@
       </div>
       <el-row :gutter="20" style="margin-top: 10px">
         <el-col :span="24">
-          <el-form size="mini" ref="dataForm" :model="temp" label-position="left" label-width="100px"
+          <el-form size="mini" ref="dataForm" :model="temp" label-position="left" label-width="180px"
                    style=' margin-left:0px;'>
             <el-row :gutter="100" type="flex" class="row-bg" style="height: 40px;margin-left: 20px;">
               <el-col :span="16">
                 <el-form-item prop="materialName" :label="$t('huanbaoTable.FMD.documentType')">
-                  <el-input v-model="temp.selectedDocumentType"></el-input>
+                  <el-select v-model="temp.selectedDocumentType" placeholder="" style="width: 100%">
+                    <el-option
+                      v-for="item in options2"
+                      :key="item.value"
+                      :label="item.label"
+                      :value="item.value">
+                    </el-option>
+                  </el-select>
                 </el-form-item>
               </el-col>
               <el-col :span="8">
@@ -62,14 +69,20 @@
       <div class="longcheer_hr" style="margin-top: 10px;">
         <span>{{$t('huanbaoTable.FMD.third')}}</span>
       </div>
+      <el-row style="margin-top: 5px;">
+        <el-col :span="6">
+          <el-input placeholder="" size="mini" v-model="tFilters"></el-input>
+        </el-col>
+      </el-row>
       <el-row class="card_row">
         <el-col span="24">
           <el-table
             ref="multipleTable1"
-            :data="thirdTable"
+            :data="thirdTable | tablefilters(tFilters)"
             border
+            :height="thirdTable.length === 0 ? '100' : '300'"
             size="mini"
-            style="width: 100%"
+            style="width: 100%; margin-top: 5px"
             @selection-change="handleSelectionChangeThird">
             <el-table-column
               type="selection"
@@ -139,27 +152,33 @@
               width="120"
               fixed="right"
               align="center"
-              label="操作">
+              :label="$t('huanbaoTable.detailTable.operating')">
               <template slot-scope="scope">
-                <el-button @click="relevant(scope.row)" type="text" size="small">相关物料</el-button>
-                <el-button @click="uploadMaterial(scope.row)" type="text" size="small">下载</el-button>
+                <el-button @click="relevant(scope.row)" type="text" size="small">{{$t('huanbaoTable.FMD.Relatedmaterials')}}</el-button>
+                <el-button @click="uploadMaterial(scope.row)" type="text" size="small">{{$t('huanbaoTable.MSDS.download')}}</el-button>
               </template>
             </el-table-column>
           </el-table>
         </el-col>
       </el-row>
       <!--可复用的msds报告-->
-      <div class="longcheer_hr" style="margin-top: 10px;">
-        <span>可复用的MSDS和申报物质报告</span>
+      <div class="longcheer_hr" style="margin-top: 5px;">
+        <span>{{$t('huanbaoTable.FMD.Reusable')}}</span>
       </div>
+      <el-row style="margin-top: 10px;">
+        <el-col :span="6">
+          <el-input placeholder="" size="mini" v-model="mFilters"></el-input>
+        </el-col>
+      </el-row>
       <el-row class="card_row">
         <el-col span="24">
           <el-table
             ref="multipleTable2"
-            :data="msdsTable"
+            :data="msdsTable | mablefilters(mFilters)"
             border
+            :height="msdsTable.length === 0 ? '100' : '300'"
             size="mini"
-            style="width: 100%"
+            style="width: 100%;margin-top: 5px"
             @selection-change="handleSelectionChangeMsds">
             <el-table-column
               type="selection"
@@ -168,7 +187,7 @@
             <el-table-column align="center" show-overflow-tooltip="true"  prop="materilaNum"  :label="$t('huanbaoTable.FMD.materialNumber')" >
               <template
                 slot-scope="scope">
-                <span>{{$t(scope.row.materilaNum)}}</span>
+                <span>{{scope.row.materilaNum}}</span>
               </template>
             </el-table-column>
             <el-table-column align="center" show-overflow-tooltip="true"  prop="documentType"  :label="$t('huanbaoTable.FMD.documentType')" >
@@ -217,9 +236,9 @@
               width="120"
               fixed="right"
               align="center"
-              label="操作">
+              :label="$t('huanbaoTable.detailTable.operating')">
               <template slot-scope="scope">
-                <el-button @click="uploadMsds(scope.row)" type="text" size="small">下载</el-button>
+                <el-button @click="uploadMsds(scope.row)" type="text" size="small">{{$t('huanbaoTable.MSDS.download')}}</el-button>
               </template>
             </el-table-column>
           </el-table>
@@ -237,15 +256,37 @@
 <script>
 import RelevantMaterials from './relevantMaterials'
 import { searchReuseReport, getMaterialName, reuseReportsExecute } from '@/api/index'
-import { downloadAttach } from '@/api/huanbaoAPI'
+import { downloadAttach, docType } from '@/api/huanbaoAPI'
 export default {
   components: {RelevantMaterials},
   name: 'ThirdReuse',
-  props: [''],
+  props: ['getDataList'],
+  filters: {
+    tablefilters: function (value, data) {
+      var sz = []
+      value.forEach(function (v, index) {
+        if (v.materialNumber.indexOf(data) !== -1) {
+          sz.push(v)
+        }
+      })
+      return sz
+    },
+    mablefilters: function (value, data) {
+      var sz = []
+      value.forEach(function (v, index) {
+        if (v.materilaNum.indexOf(data) !== -1) {
+          sz.push(v)
+        }
+      })
+      return sz
+    }
+  },
   mounted: function () {
   },
   data () {
     return {
+      tFilters: '',
+      mFilters: '',
       oid: '',
       dialogVisible: false,
       temp: {
@@ -263,7 +304,7 @@ export default {
     }
   },
   methods: {
-    setThirdReuseDialogFormVisible (e) {
+    setThirdReuseDialogFormVisible (e, oid) {
       this.temp = {
         selectedDocumentType: '',
         selectedMaterial: '',
@@ -272,8 +313,11 @@ export default {
       this.thirdTable = []
       this.msdsTable = []
       this.options = []
+      this.options2 = []
       this.dialogVisible = true
       this.temp.envpNumber = e
+      this.oid = ''
+      this.oid = oid
       getMaterialName(e).then(r => {
         console.log('getMaterialName', r)
         var names = [{
@@ -288,14 +332,42 @@ export default {
         }
         this.options = names
       })
+      var that = this
+      docType().then(r => {
+        var names = [{
+          value: '',
+          label: ''
+        }]
+        for (let i in r.data) {
+          if (r.data[i].name === '其他') {
+            names.push({
+              value: r.data[i].id,
+              label: that.$t('huanbaoTable.submitted.OTHER')
+            })
+          } else {
+            names.push({
+              value: r.data[i].id,
+              label: r.data[i].name
+            })
+          }
+        }
+        this.options2 = names
+      })
     },
     completeFMD () {
       this.dialogVisible = false
       reuseReportsExecute(this.reports, this.attachs, this.temp.envpNumber).then(r => {
         console.log('reuseReportsExecute', r.data.status)
         if (r.data.status === 'success') {
+          this.$props.getDataList(this.oid)
           this.$message.success({
-            message: '恭喜你，这是一条成功消息'
+            dangerouslyUseHTMLString: true,
+            message: this.$t('success.update_success') + '<br/>' + r.data.warning
+          })
+        } else {
+          this.$message.error({
+            dangerouslyUseHTMLString: true,
+            message: r.data.info
           })
         }
       })
@@ -306,16 +378,18 @@ export default {
     searchResult () {
       searchReuseReport(this.temp).then(r => {
         console.log('searchReuseReport', r)
-        for (let i in r.data) {
+        this.thirdTable = r.data.report
+        this.msdsTable = r.data.attach
+        /* for (let i in r.data) {
           this.thirdTable = r.data[i].report
           this.msdsTable = r.data[i].attach
-        }
+        } */
       })
     },
     handleSelectionChangeThird (val) {
       var reports = ''
       for (let i in val) {
-        reports = val[i].reportId + ',' + reports
+        reports = val[i].reportOid + ',' + reports
       }
       reports = reports.substring(0, reports.length - 1)
       this.reports = reports
@@ -323,7 +397,7 @@ export default {
     handleSelectionChangeMsds (val) {
       var attachs = ''
       for (let i in val) {
-        attachs = val[i].attachId + ',' + attachs
+        attachs = val[i].attachOid + ',' + attachs
       }
       attachs = attachs.substring(0, attachs.length - 1)
       this.attachs = attachs
@@ -333,12 +407,12 @@ export default {
     },
     uploadMaterial (row) {
       downloadAttach(row.reportOid).then(r => {
-        window.open('http://172.16.9.169:8080/files/getFile?route=' + r.data.filePath + '&userName=' + this.$store.getters.userInfo.username, '_blank')
+        window.open(this.$store.state.filePath + '/files/getFile?route=' + encodeURIComponent(r.data.filePath) + '&userName=' + this.$store.getters.userInfo.username, '_blank')
       })
     },
     uploadMsds (row) {
       downloadAttach(row.attachOid).then(r => {
-        window.open('http://172.16.9.169:8080/files/getFile?route=' + r.data.filePath + '&userName=' + this.$store.getters.userInfo.username, '_blank')
+        window.open(this.$store.state.filePath + '/files/getFile?route=' + encodeURIComponent(r.data.filePath) + '&userName=' + this.$store.getters.userInfo.username, '_blank')
       })
     }
   }
@@ -360,8 +434,8 @@ export default {
     background-image: url(../../assets/image/tab2.png);
     background-repeat: no-repeat;
     background-size: 95% 100%;
-    width: 250px;
-    padding: 5px 15px;
+    padding: 5px 30px 0px 15px;
+    width: auto;
     height: 27px;
     color: #ffffff;
   }

@@ -4,7 +4,7 @@
       <el-row :gutter="20">
         <el-col :span="24">
           <div class="boxtext">
-            <el-form size="mini" ref="dataForm" :model="temp" label-position="left" label-width="120px"
+            <el-form size="mini" ref="dataForm" :model="temp" label-position="left" :label-width="$store.getters.guojihua==='en'?'180px':'140px'"
                      style=' margin-left:0px;'>
               <el-row :gutter="100" type="flex" class="row-bg" style="height: 40px;">
               <el-col :span="8">
@@ -29,8 +29,8 @@
                 </el-form-item>
               </el-col>
             </el-row>
-              <el-row :gutter="100" type="flex" class="row-bg" style="height: 40px;">
-                <el-col :span="8">
+              <el-row  :gutter="100" type="flex" class="row-bg" style="height: 40px;">
+                <el-col v-show="false" :span="8">
                   <el-form-item prop="materialCode" :label="$t('pcn.table.project')">
                     <el-input   v-model="model.serchItems.LQ_PROJECT"></el-input>
                   </el-form-item>
@@ -38,7 +38,12 @@
                 <el-col :span="8">
                   <el-form-item prop="materialName" :label="$t('pcn.form.ResourceEngineer')">
                     <!--<el-input v-model="model.serchItems.sourceEngineer"></el-input>-->
-                    <el-input v-model="sourceEngineerName" readonly="true">
+                    <el-input clearable="true" readonly="true" v-model="sourceEngineerName">
+                      <i
+                        class="el-icon-close el-input__icon"
+                        slot="suffix"
+                        @click="handleIconClick">
+                      </i>
                       <el-button @click="escapeClick"  slot="append" icon="el-icon-search"></el-button>
                     </el-input>
                   </el-form-item>
@@ -109,12 +114,12 @@
             <span>{{scope.row.ecrName}}</span>
           </template>
         </el-table-column>
-        <el-table-column prop="project" :label="$t('pcn.table.project')" align="center" show-overflow-tooltip="true"  width="180">
-          <template
-            slot-scope="scope">
-            <span>{{scope.row.project}}</span>
-          </template>
-        </el-table-column>
+        <!--<el-table-column  prop="project" :label="$t('pcn.table.project')" align="center" show-overflow-tooltip="true"  width="180">-->
+          <!--<template-->
+            <!--slot-scope="scope">-->
+            <!--<span>{{scope.row.project}}</span>-->
+          <!--</template>-->
+        <!--</el-table-column>-->
         <el-table-column prop="RequireCompletionTime" :label="$t('pcn.table.RequireCompletionTime')" align="center" show-overflow-tooltip="true"  width="180">
           <template
             slot-scope="scope">
@@ -130,7 +135,7 @@
         <el-table-column prop="state" :label="$t('pcn.table.state')" align="center" show-overflow-tooltip="true"  width="180">
           <template
             slot-scope="scope">
-            <span>{{scope.row.state}}</span>
+            <span>{{$t('pcn.select.state.' + scope.row.state)}}</span>
           </template>
         </el-table-column>
        </el-table>
@@ -152,8 +157,7 @@
 <script>
 import ResourceEngineer from '@/components/PcnDialog/ResourceEngineer'
 import pcnUpdate from '@/components/PcnDialog/index'
-import { searchEcr, ecrType } from '@/api/pcn'
-import { getSealedSampleStatus } from '@/api/index'
+import { searchEcr, ecrType, ecrState } from '@/api/pcn'
 import { initPage } from '@/utils/index'
 export default {
   name: 'myPcn',
@@ -183,6 +187,10 @@ export default {
   methods: {
     goDetail (data) {
       this.$refs.pcnUpdate.openDialog(data.oid)
+    },
+    handleIconClick () {
+      this.sourceEngineerName = ''
+      this.model.serchItems.sourceEngineer = ''
     },
     getEcrType () {
       ecrType().then(r => {
@@ -220,13 +228,13 @@ export default {
       this.getDataList(val)
     },
     getEnvpStates () {
-      getSealedSampleStatus().then(r => {
+      ecrState().then(r => {
         console.log(r)
         var states = [{value: '', label: ''}]
-        for (var i in r.data[0].state) {
+        for (var i in r.data) {
           states.push({
-            value: r.data[0].state[i],
-            label: this.$t('huanbaoTable.searchStatus.' + r.data[0].state[i])
+            value: r.data[i].value,
+            label: this.$t('pcn.select.state.' + r.data[i].value)
           })
         }
         this.options2 = states
@@ -235,7 +243,7 @@ export default {
   }
 }
 </script>
-<style>
+<style scoped>
   .boxtext {
     font-size: 15px;
   }

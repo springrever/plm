@@ -80,7 +80,7 @@
               <el-row>
                 <el-button size="mini" type="primary" plain @click="fmdDownload">{{$t('huanbaoTable.FMD.download')}}</el-button>
                 <el-button size="mini" type="success" plain
-                           @click="fmdUpload" v-if="fmdEditAble">{{$t('huanbaoTable.FMD.upload')}}</el-button>
+                           @click="fmdUpload" v-if="FMDUPLOAD">{{$t('huanbaoTable.FMD.upload')}}</el-button>
                 <el-button size="mini" v-if="fmdEditAble"
                            :loading="$store.getters.loading"
                            @click="thirdreuseFMD"
@@ -92,12 +92,13 @@
                   width="1000px"
                   trigger="hover"
                   :content="fmdOpinion">
-                  <el-button slot="reference" size="mini" type="danger" plain>审批意见</el-button>
+                  <el-button slot="reference" size="mini" type="danger" plain>{{$t('huanbaoTable.detailTable.approvalComments')}}</el-button>
                 </el-popover>
               </el-row>
               <el-table
                 :data="tableDataFMD"
                 border
+                :height="tableDataFMD.length === 0 ? '100' : '400'"
                 size="mini"
                 style="width: 100%;margin-top: 10px">
                 <el-table-column prop="materialName" align="center" show-overflow-tooltip="true" :label="$t('huanbaoTable.FMD.materialName')" >
@@ -148,10 +149,13 @@
                     <span>{{scope.row.contentRate}}</span>
                   </template>
                 </el-table-column>
-                <el-table-column prop="exemptions" align="center" show-overflow-tooltip="true" :label="$t('huanbaoTable.FMD.exemptions')" >
+                <el-table-column prop="exemptions" align="center"  :label="$t('huanbaoTable.FMD.exemptions')" >
                   <template
                     slot-scope="scope">
-                    <span>{{scope.row.exemptions}}</span>
+                    <span v-for="(item, index) in scope.row.exemptions" v-bind:key="index">
+                      <span v-if="item.exemptionsIsRed === 'true'" style="color: red">{{item.exemption + ','}}</span>
+                      <span v-if="item.exemptionsIsRed === 'false'" >{{item.exemption + ','}}</span>
+                    </span>
                   </template>
                 </el-table-column>
                 <el-table-column prop="state" align="center" show-overflow-tooltip="true" :label="$t('huanbaoTable.FMD.state')">
@@ -160,7 +164,7 @@
                     <span>{{$t('huanbaoTable.FMD.'+scope.row.state)}}</span>
                   </template>
                 </el-table-column>
-                <el-table-column align="center" fixed="right" label="操作" width="100"
+                <el-table-column align="center" fixed="right" :label="$t('huanbaoTable.detailTable.operating')" width="100"
                   v-if="fmdEditAble">
                   <template slot-scope="scope">
                     <el-button @click="editFMD(scope.row)" type="text" size="small">{{$t('huanbaoTable.FMD.edit')}}</el-button>
@@ -177,7 +181,7 @@
                   width="1000px"
                   trigger="hover"
                   :content="msdsOpinion">
-                  <el-button slot="reference" size="mini" type="danger" plain>审批意见</el-button>
+                  <el-button slot="reference" size="mini" type="danger" plain>{{$t('huanbaoTable.detailTable.approvalComments')}}</el-button>
                 </el-popover>
               </el-row>
               <el-table
@@ -221,7 +225,7 @@
                     <span>{{$t('huanbaoTable.MSDS.'+scope.row.state)}}</span>
                   </template>
                 </el-table-column>
-                <el-table-column align="center" fixed="right" label="操作" width="100">
+                <el-table-column align="center" fixed="right" :label="$t('huanbaoTable.detailTable.operating')" width="100">
                   <template slot-scope="scope">
                     <el-button v-if="msdsEditAble" @click="editMSDS(scope.row)" type="text" size="small">{{$t('formButton.edit')}}</el-button>
                     <el-button @click="checkMSDS(scope.row)" type="text" size="small">{{$t('formButton.check')}}</el-button>
@@ -231,21 +235,21 @@
             </el-tab-pane>
             <el-tab-pane :label="$t('huanbaoTable.submitted.RoHS')">
               <el-row>
-                <el-button size="mini" type="primary" plain @click="downloadRoHS">下载导入模板</el-button>
+                <el-button size="mini" type="primary" plain @click="downloadRoHS">{{$t('huanbaoTable.ROHS.download')}}</el-button>
                 <el-button size="mini" type="success" plain
-                           v-if="rohsEditAble"
-                           @click="ROHSUpload">上传环保数据</el-button>
+                           v-if="ROHSUPLOAD"
+                           @click="ROHSUpload">{{$t('huanbaoTable.ROHS.Upload')}}</el-button>
                 <el-button size="mini" type="warning" plain
                            v-if="rohsEditAble"
-                           @click="editRoHSReport">编辑RoHS总报告</el-button>
-                <el-button @click="checkRoHSReport" size="mini" type="info" plain>查看RoHS总报告</el-button>
+                           @click="editRoHSReport">{{$t('huanbaoTable.ROHS.editGeneralReport')}}</el-button>
+                <el-button @click="checkRoHSReport" size="mini" type="info" plain>{{$t('huanbaoTable.ROHS.viewGeneralReport')}}</el-button>
                 <el-popover
                   v-if="isShow"
                   placement="top-start"
                   width="1000px"
                   trigger="hover"
                   :content="rohsOpinion">
-                  <el-button slot="reference" size="mini" type="danger" plain>审批意见</el-button>
+                  <el-button slot="reference" size="mini" type="danger" plain>{{$t('huanbaoTable.detailTable.approvalComments')}}</el-button>
                 </el-popover>
               </el-row>
               <el-table
@@ -367,7 +371,7 @@
                     <span>{{$t('huanbaoTable.ROHS.'+scope.row.state)}}</span>
                   </template>
                 </el-table-column>
-                <el-table-column align="center" fixed="right" label="操作" width="100">
+                <el-table-column align="center" fixed="right" :label="$t('huanbaoTable.detailTable.operating')" width="100">
                   <template slot-scope="scope">
                     <el-button v-if="rohsEditAble" @click="editRoHS(scope.row)" type="text" size="small">{{$t('formButton.edit')}}</el-button>
                     <el-button @click="checkRoHS(scope.row)" type="text" size="small">{{$t('formButton.check')}}</el-button>
@@ -379,15 +383,15 @@
               <el-row>
                 <el-button size="mini" type="warning" plain
                            v-if="hfEditAble"
-                           @click="editHFReport">编辑HF总报告</el-button>
-                <el-button @click="checkHFReport" size="mini" type="info" plain>查看HF总报告</el-button>
+                           @click="editHFReport">{{$t('huanbaoTable.HF.editGeneralReport')}}</el-button>
+                <el-button @click="checkHFReport" size="mini" type="info" plain>{{$t('huanbaoTable.HF.viewGeneralReport')}}</el-button>
                 <el-popover
                   v-if="isShow"
                   placement="top-start"
                   width="1000px"
                   trigger="hover"
                   :content="hfOpinion">
-                  <el-button slot="reference" size="mini" type="danger" plain>审批意见</el-button>
+                  <el-button slot="reference" size="mini" type="danger" plain>{{$t('huanbaoTable.detailTable.approvalComments')}}</el-button>
                 </el-popover>
               </el-row>
               <el-table
@@ -455,7 +459,7 @@
                     <span>{{$t('huanbaoTable.HF.'+scope.row.state)}}</span>
                   </template>
                 </el-table-column>
-                <el-table-column align="center" fixed="right" label="操作" width="100">
+                <el-table-column align="center" fixed="right" :label="$t('huanbaoTable.detailTable.operating')" width="100">
                   <template slot-scope="scope">
                     <el-button v-if="hfEditAble" @click="editHF(scope.row)" type="text" size="small">{{$t('formButton.edit')}}</el-button>
                     <el-button @click="checkHF(scope.row)" type="text" size="small">{{$t('formButton.check')}}</el-button>
@@ -467,17 +471,17 @@
               <el-row>
                 <el-button size="mini" type="warning" plain
                            v-if="reachEditAble"
-                           @click="editREACHTotalReport">编辑REACH总报告</el-button>
-                <el-button size="mini" type="info" plain @click="checkREACHTotalReport">查看REACH总报告</el-button>
-                <el-button size="mini" type="primary" plain v-if="reachEditAble" @click="editGeneralStatement">编辑REACH总声明</el-button>
-                <el-button size="mini" type="info" plain @click="checkGeneralStatement">查看REACH总声明</el-button>
+                           @click="editREACHTotalReport">{{$t('huanbaoTable.REACH.editGeneralReport')}}</el-button>
+                <el-button size="mini" type="info" plain @click="checkREACHTotalReport">{{$t('huanbaoTable.REACH.viewGeneralReport')}}</el-button>
+                <el-button size="mini" type="primary" plain v-if="reachEditAble" @click="editGeneralStatement">{{$t('huanbaoTable.REACH.Editstatement')}}</el-button>
+                <el-button size="mini" type="info" plain @click="checkGeneralStatement">{{$t('huanbaoTable.REACH.Viewstatement')}}</el-button>
                 <el-popover
                   v-if="isShow"
                   placement="top-start"
                   width="1000px"
                   trigger="hover"
                   :content="reachOpinion">
-                  <el-button slot="reference" size="mini" type="danger" plain>审批意见</el-button>
+                  <el-button slot="reference" size="mini" type="danger" plain>{{$t('huanbaoTable.detailTable.approvalComments')}}</el-button>
                 </el-popover>
               </el-row>
               <el-table
@@ -533,7 +537,7 @@
                     <span>{{$t('huanbaoTable.MSDS.'+scope.row.state)}}</span>
                   </template>
                 </el-table-column>
-                <el-table-column align="center" fixed="right" label="操作" width="100">
+                <el-table-column align="center" fixed="right" :label="$t('huanbaoTable.detailTable.operating')" width="100">
                   <template slot-scope="scope">
                     <el-button v-if="reachEditAble" @click="editREACH(scope.row)" type="text" size="small">{{$t('formButton.edit')}}</el-button>
                     <el-button @click="checkREACH(scope.row)" type="text" size="small">{{$t('formButton.check')}}</el-button>
@@ -545,15 +549,15 @@
               <el-row>
                 <el-button size="mini" type="warning" plain
                            v-if="other1EditAble"
-                           @click="editOtherReport">编辑其他总报告</el-button>
-                <el-button @click="checkOtherReport" size="mini" type="info" plain>查看其他总报告</el-button>
+                           @click="editOtherReport">{{$t('huanbaoTable.OTHER.editGeneralReport')}}</el-button>
+                <el-button @click="checkOtherReport" size="mini" type="info" plain>{{$t('huanbaoTable.OTHER.viewGeneralReport')}}</el-button>
                 <el-popover
                   v-if="isShow"
                   placement="top-start"
                   width="1000px"
                   trigger="hover"
                   :content="otherOpinion">
-                  <el-button slot="reference" size="mini" type="danger" plain>审批意见</el-button>
+                  <el-button slot="reference" size="mini" type="danger" plain>{{$t('huanbaoTable.detailTable.approvalComments')}}</el-button>
                 </el-popover>
               </el-row>
               <el-table
@@ -651,7 +655,7 @@
                     <span>{{$t('huanbaoTable.OTHER.'+scope.row.state)}}</span>
                   </template>
                 </el-table-column>
-                <el-table-column align="center" fixed="right" label="操作" width="100">
+                <el-table-column align="center" fixed="right" :label="$t('huanbaoTable.detailTable.operating')" width="100">
                   <template slot-scope="scope">
                     <el-button v-if="other1EditAble" @click="editOther(scope.row)" type="text" size="small">{{$t('formButton.edit')}}</el-button>
                     <el-button @click="checkOther(scope.row)" type="text" size="small">{{$t('formButton.check')}}</el-button>
@@ -663,14 +667,14 @@
               <el-row>
                 <el-button size="mini" type="warning" plain
                            v-if="other2EditAble"
-                           @click="editSpecialNeeds">编辑客户特殊需求申报</el-button>
+                           @click="editSpecialNeeds">{{$t('huanbaoTable.OTHER2.specialneeds')}}</el-button>
                 <el-popover
                   v-if="isShow"
                   placement="top-start"
                   width="1000px"
                   trigger="hover"
                   :content="other2Opinion">
-                  <el-button slot="reference" size="mini" type="danger" plain>审批意见</el-button>
+                  <el-button slot="reference" size="mini" type="danger" plain>{{$t('huanbaoTable.detailTable.approvalComments')}}</el-button>
                 </el-popover>
               </el-row>
               <el-table
@@ -702,9 +706,9 @@
                     <span>{{$t('huanbaoTable.OTHER2.'+scope.row.state)}}</span>
                   </template>
                 </el-table-column>
-                <el-table-column align="center" fixed="right" label="操作" width="100">
+                <el-table-column align="center" fixed="right" :label="$t('huanbaoTable.detailTable.operating')" width="100">
                   <template slot-scope="scope">
-                    <el-button type="text" size="small" @click="downloadNeeds(scope.row)">下载</el-button>
+                    <el-button type="text" size="small" @click="downloadNeeds(scope.row)">{{$t('huanbaoTable.MSDS.download')}}</el-button>
                   </template>
                 </el-table-column>
               </el-table>
@@ -712,7 +716,7 @@
           </el-tabs>
           <el-row v-if="this.approvalType === 'YEAH'">
             <div class="longcheer_hr" style="margin-top: 20px">
-              <span>审批</span>
+              <span>{{$t('huanbaoTable.detailTable.approval')}}</span>
             </div>
             <el-row class="card_row">
               <el-col span="4" style="text-align: right">{{$t('huanbaoTable.detailTable.remark')}} :</el-col>
@@ -736,7 +740,7 @@
             </el-row>
           </el-row>
           <div class="longcheer_hr" style="margin-top: 20px">
-            <span>{{$t('huanbaoTable.detailTable.approval')}}</span>
+            <span>{{$t('huanbaoTable.detailTable.approvals')}}</span>
           </div>
           <el-row class="card_row">
             <el-col span="24">
@@ -796,7 +800,8 @@
                               :getDataList = 'getDataList'
                               :updateFMDData="updateFMDData"></edit-f-m-d-dialog>
           <third-reuse ref="thirdReuse"
-                       :acceptSonValueByThird = 'acceptSonValueByThird'></third-reuse>
+                       :acceptSonValueByThird = 'acceptSonValueByThird'
+                       :getDataList = 'getDataList'></third-reuse>
           <edit-msds ref="editMsds"
                      :updateMSDSData = 'updateMSDSData'></edit-msds>
           <rohs-dialog ref="editRohs"
@@ -818,7 +823,7 @@
 </template>
 <script>
 import { showEnvprotectionTask, selectFMD, selectMSDS, selectRoHS, selectHF, selectREACH, selectOTHER, selectOTHER2, processHistory, envpComments } from '@/api/index'
-import { executeUploadFMDData, executeUploadItemData, deleteFmdItem, downloadAttach, downloadEnvpTemplate, completeEnvp, checkData, itemEditAble } from '@/api/huanbaoAPI'
+import { executeUploadFMDData, executeUploadItemData, deleteFmdItem, downloadAttach, downloadEnvpTemplate, completeEnvp, checkData, itemEditAble, checkMaterialAttr } from '@/api/huanbaoAPI'
 import EditFMDDialog from '../../../components/huanbaoDialog/editFMDDialog'
 import ThirdReuse from '../../../components/huanbaoDialog/thirdReuseFMD'
 import EditMsds from '../../../components/huanbaoDialog/editMSDS'
@@ -876,7 +881,7 @@ export default {
         casNo: '',
         substanceWeight: '',
         contentRate: '',
-        exemptions: '',
+        exemptions: [],
         state: ''
       }],
       tableDataMSDS: [{
@@ -965,7 +970,9 @@ export default {
       other1EditAble: false,
       other2EditAble: false,
       reachEditAble: false,
-      rohsEditAble: false
+      rohsEditAble: false,
+      FMDUPLOAD: false,
+      ROHSUPLOAD: false
     }
   },
   filters: {
@@ -986,8 +993,17 @@ export default {
     this.approvalType = this.$route.params.approvalType
     if (this.oid) {
       this.getDataList(this.oid)
+      this.ifEditAble(this.oid)
+    }
+  },
+  methods: {
+    // 子组件调用
+    acceptSonValueByEdit () {
+      this.getDataList(this.oid)
+    },
+    ifEditAble (e) {
       if (this.approvalType === 'YEAH') {
-        itemEditAble(this.oid).then(r => {
+        itemEditAble(e).then(r => {
           console.log('itemEditAble', r)
           if (r.data.status === 'success') {
             this.fmdEditAble = r.data.FMD
@@ -997,6 +1013,8 @@ export default {
             this.other2EditAble = r.data.OTHER2
             this.reachEditAble = r.data.REACH
             this.rohsEditAble = r.data.ROHS
+            this.FMDUPLOAD = r.data.FMDUPLOAD
+            this.ROHSUPLOAD = r.data.ROHSUPLOAD
           }
         })
       } else {
@@ -1007,13 +1025,9 @@ export default {
         this.other2EditAble = false
         this.reachEditAble = false
         this.rohsEditAble = false
+        this.FMDUPLOAD = false
+        this.ROHSUPLOAD = false
       }
-    }
-  },
-  methods: {
-    // 子组件调用
-    acceptSonValueByEdit () {
-      this.getDataList(this.oid)
     },
     getDataList (e) {
       showEnvprotectionTask(e).then(r => {
@@ -1083,7 +1097,19 @@ export default {
     },
     // FMD删除
     deleteFMD (row) {
-      this.$confirm('此操作将永久删除该数据, 是否继续?', '提示', {
+      deleteFmdItem(row).then(r => {
+        if (r.data.status === 'success') {
+          this.getDataList(this.oid)
+          this.$message.success({
+            message: this.$t('success.remove_success')
+          })
+        } else {
+          this.$message.error({
+            message: r.data.warning
+          })
+        }
+      })
+      /* this.$confirm('此操作将永久删除该数据, 是否继续?', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
@@ -1092,7 +1118,7 @@ export default {
           if (r.data.status === 'success') {
             this.getDataList(this.oid)
             this.$message.success({
-              message: '删除成功'
+              message: this.$t('success.remove_success')
             })
           } else {
             this.$message.error({
@@ -1101,33 +1127,60 @@ export default {
           }
         })
       }).catch(() => {
-        this.$message({
-          type: 'info',
-          message: '已取消删除'
-        })
-      })
+      }) */
     },
     // 提交
     submit () {
       this.$store.commit('SET_LOADING', true)
-      checkData('HSF' + this.model.materialNumber).then(r => {
-        if (r.data.status === 'success') {
-          completeEnvp(this.oid, this.comment, this.radio).then(r => {
-            console.log('completeSealedTask', r)
-            if (r.data.status === 'success') {
-              this.$message.success({
-                message: '任务已提交'
-              })
-              this.closePage()
-            }
-          })
-        } else {
-          this.$message.error({
-            dangerouslyUseHTMLString: true,
-            message: r.data.info
-          })
-        }
-      })
+      var types = this.$store.getters.guojihua === 'zh' ? 'Chinese' : 'English'
+      if (this.radio === '供货') {
+        checkData('HSF' + this.model.materialNumber, types).then(r => {
+          if (r.data.status === 'success') {
+            checkMaterialAttr(this.oid, types).then(r => {
+              if (r.data.status === 'success') {
+                if (r.data.flag) {
+                  completeEnvp(this.oid, this.comment, this.radio).then(r => {
+                    console.log('completeSealedTask', r)
+                    if (r.data.status === 'success') {
+                      this.$message.success({
+                        message: this.$t('success.finsh_task_success')
+                      })
+                      this.closePage()
+                    }
+                  })
+                } else {
+                  this.$message.warning({
+                    dangerouslyUseHTMLString: true,
+                    message: r.data.info
+                  })
+                  this.getDataList(this.oid)
+                }
+              } else {
+                this.$message.warning({
+                  dangerouslyUseHTMLString: true,
+                  message: r.data.mes
+                })
+              }
+            })
+          } else {
+            this.$message.error({
+              dangerouslyUseHTMLString: true,
+              message: r.data.info,
+              duration: 2000
+            })
+          }
+        })
+      } else {
+        completeEnvp(this.oid, this.comment, this.radio).then(r => {
+          console.log('completeSealedTask', r)
+          if (r.data.status === 'success') {
+            this.$message.success({
+              message: this.$t('success.finsh_task_success')
+            })
+            this.closePage()
+          }
+        })
+      }
     },
     closePage () {
       this.$router.replace({name: 'submitted'})
@@ -1147,7 +1200,7 @@ export default {
     },
     // FMD 第三方复用
     thirdreuseFMD () {
-      this.$refs.thirdReuse.setThirdReuseDialogFormVisible(this.model.number)
+      this.$refs.thirdReuse.setThirdReuseDialogFormVisible(this.model.number, this.oid)
     },
     // MSDS 编辑
     editMSDS (row) {
@@ -1159,11 +1212,11 @@ export default {
     },
     // 编辑rohs总报告
     editRoHSReport () {
-      this.$refs.generalReport.setgeneralReportDialogisible('edit', 'RoHS总报告', this.oid, 'RoHS')
+      this.$refs.generalReport.setgeneralReportDialogisible('edit', this.$t('huanbaoTable.ROHS.report'), this.oid, 'RoHS')
     },
     // 查看rohs总报告
     checkRoHSReport () {
-      this.$refs.generalReport.setgeneralReportDialogisible('view', 'RoHS总报告', this.oid, 'RoHS')
+      this.$refs.generalReport.setgeneralReportDialogisible('view', this.$t('huanbaoTable.ROHS.report'), this.oid, 'RoHS')
     },
     // rohs 编辑
     editRoHS (row) {
@@ -1175,11 +1228,11 @@ export default {
     },
     // 编辑 HF 总报告
     editHFReport () {
-      this.$refs.generalReport.setgeneralReportDialogisible('edit', 'HF总报告', this.oid, 'HF')
+      this.$refs.generalReport.setgeneralReportDialogisible('edit', this.$t('huanbaoTable.HF.report'), this.oid, 'HF')
     },
     // 查看 HF 总报告
     checkHFReport () {
-      this.$refs.generalReport.setgeneralReportDialogisible('view', 'HF总报告', this.oid, 'HF')
+      this.$refs.generalReport.setgeneralReportDialogisible('view', this.$t('huanbaoTable.HF.report'), this.oid, 'HF')
     },
     // HF 编辑
     editHF (row) {
@@ -1191,11 +1244,11 @@ export default {
     },
     // 编辑 REACH 总报告
     editREACHTotalReport () {
-      this.$refs.generalReport.setgeneralReportDialogisible('edit', 'REACH总报告', this.oid, 'REACH')
+      this.$refs.generalReport.setgeneralReportDialogisible('edit', this.$t('huanbaoTable.REACH.REACH'), this.oid, 'REACH')
     },
     // 查看 REACH 总报告
     checkREACHTotalReport () {
-      this.$refs.generalReport.setgeneralReportDialogisible('view', 'REACH总报告', this.oid, 'REACH')
+      this.$refs.generalReport.setgeneralReportDialogisible('view', this.$t('huanbaoTable.REACH.REACH'), this.oid, 'REACH')
     },
     // 编辑REACH总声明
     editGeneralStatement () {
@@ -1215,11 +1268,11 @@ export default {
     },
     // 编辑 other 总报告
     editOtherReport () {
-      this.$refs.generalReport.setgeneralReportDialogisible('edit', '编辑总报告', this.oid, 'OTHER')
+      this.$refs.generalReport.setgeneralReportDialogisible('edit', this.$t('huanbaoTable.OTHER.OTHER'), this.oid, 'OTHER')
     },
     // 查看 other 总报告
     checkOtherReport () {
-      this.$refs.generalReport.setgeneralReportDialogisible('view', '编辑总报告', this.oid, 'OTHER')
+      this.$refs.generalReport.setgeneralReportDialogisible('view', this.$t('huanbaoTable.OTHER.OTHER'), this.oid, 'OTHER')
     },
     // Other 编辑
     editOther (row) {
@@ -1236,7 +1289,7 @@ export default {
     // fmd 上传数据
     fmdUpload () {
       this.$refs.fileUpload.openDialog()
-      this.$refs.fileUpload.setAttribute('http://172.16.9.169:8080/files/upLoad', [], '上传FMD数据', 'fileList', {
+      this.$refs.fileUpload.setAttribute(this.$store.state.filePath + '/files/upLoad', [], this.$t('huanbaoTable.detailTable.uploadData'), 'fileList', {
         number: this.$store.getters.huanbaoNum,
         userName: this.$store.getters.userInfo.username
       }, 'FMD')
@@ -1244,7 +1297,7 @@ export default {
     // rohs 上传数据
     ROHSUpload () {
       this.$refs.fileUpload.openDialog()
-      this.$refs.fileUpload.setAttribute('http://172.16.9.169:8080/files/upLoad', [], '上传RoHS数据', 'fileList', {
+      this.$refs.fileUpload.setAttribute(this.$store.state.filePath + '/files/upLoad', [], this.$t('huanbaoTable.detailTable.uploadData'), 'fileList', {
         number: this.$store.getters.huanbaoNum,
         userName: this.$store.getters.userInfo.username
       }, 'RoHS')
@@ -1304,13 +1357,32 @@ export default {
     // 文件路径传给后台
     returnFilePath (e, type) {
       this.$refs.fileUpload.closeDialog()
+      var types = this.$store.getters.guojihua === 'zh' ? 'Chinese' : 'English'
       if (type === 'FMD') {
-        executeUploadFMDData(this.oid, e[0].response.data[0]).then(r => {
+        executeUploadFMDData(this.oid, e[0].path, types).then(r => {
           if (r.data.status === 'success') {
             this.getDataList(this.oid)
-            this.$message.success({
-              message: '上传FMD数据成功'
-            })
+            this.ifEditAble(this.oid)
+            var warn = ''
+            if (r.data.warning) {
+              warn = r.data.warning
+              this.$message.warning({
+                dangerouslyUseHTMLString: true,
+                message: warn
+              })
+              if (r.data.warning2) {
+                warn = r.data.warning + r.data.warning2
+                this.$message.warning({
+                  dangerouslyUseHTMLString: true,
+                  message: warn
+                })
+              }
+            } else {
+              this.$message.success({
+                dangerouslyUseHTMLString: true,
+                message: this.$t('success.create_success')
+              })
+            }
           } else {
             this.$message.error({
               message: r.data.info
@@ -1319,11 +1391,12 @@ export default {
         })
       }
       if (type === 'RoHS') {
-        executeUploadItemData(this.oid, e[0].response.data[0]).then(r => {
+        executeUploadItemData(this.oid, e[0].path, types).then(r => {
           if (r.data.status === 'success') {
             this.getDataList(this.oid)
+            this.ifEditAble(this.oid)
             this.$message.success({
-              message: '上传RoHS数据成功'
+              message: this.$t('success.create_success')
             })
           } else {
             this.$message.error({
@@ -1335,20 +1408,20 @@ export default {
     },
     downloadNeeds (row) {
       downloadAttach(row.attachmentOid).then(r => {
-        window.open('http://172.16.9.169:8080/files/getFile?route=' + r.data.filePath + '&userName=' + this.$store.getters.userInfo.username, '_blank')
+        window.open(this.$store.state.filePath + '/files/getFile?route=' + encodeURIComponent(r.data.filePath) + '&userName=' + this.$store.getters.userInfo.username, '_blank')
       })
     },
     fmdDownload () {
       downloadEnvpTemplate('FMD').then(r => {
         if (r.data.flag) {
-          window.open('http://172.16.9.169:8080/files/getFile?route=' + r.data.filePath + '&userName=' + this.$store.getters.userInfo.username, '_blank')
+          window.open(this.$store.state.filePath + '/files/getFile?route=' + encodeURIComponent(r.data.filePath) + '&userName=' + this.$store.getters.userInfo.username, '_blank')
         }
       })
     },
     downloadRoHS () {
       downloadEnvpTemplate('ROHS').then(r => {
         if (r.data.flag) {
-          window.open('http://172.16.9.169:8080/files/getFile?route=' + r.data.filePath + '&userName=' + this.$store.getters.userInfo.username, '_blank')
+          window.open(this.$store.state.filePath + '/files/getFile?route=' + encodeURIComponent(r.data.filePath) + '&userName=' + this.$store.getters.userInfo.username, '_blank')
         }
       })
     }
@@ -1392,8 +1465,8 @@ export default {
     background-image: url(../../../assets/image/tab2.png);
     background-repeat: no-repeat;
     background-size: 95% 100%;
-    width: 120px;
-    padding: 5px 15px;
+    padding: 5px 30px 0px 15px;
+    width: auto;
     height: 27px;
     color: #ffffff;
   }

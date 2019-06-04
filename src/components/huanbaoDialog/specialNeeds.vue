@@ -10,11 +10,11 @@
       width="50%"
       top="2%">
       <div class="longcheer_hr" style="margin-top: -10px;">
-        <span class="longcheer_hr_span">联想项目必交资料</span>
+        <span class="longcheer_hr_span">{{$t('huanbaoTable.OTHER2.Lenovoinformation')}}</span>
       </div>
       <el-row style="margin-top: 10px;margin-left: 20px">
-        <el-button v-if="type === 'edit'" size="mini" type="primary" plain @click="addLenovoFile" >添加新文件</el-button>
-        <el-button v-if="type === 'edit'" size="mini" type="danger"  plain @click="deleteLenovoFile">移除</el-button>
+        <el-button v-if="type === 'edit'" size="mini" type="primary" plain @click="addLenovoFile" >{{$t('huanbaoTable.MSDS.UploadNewFiles')}}</el-button>
+        <el-button v-if="type === 'edit'" size="mini" type="danger"  plain @click="deleteLenovoFile">{{$t('huanbaoTable.MSDS.Remove')}}</el-button>
       </el-row>
       <el-row class="card_row">
         <el-col span="24">
@@ -28,13 +28,13 @@
               type="selection"
               width="35">
             </el-table-column>
-            <el-table-column align="center" show-overflow-tooltip="true"  prop="fileName"  label="文件名" >
+            <el-table-column align="center" show-overflow-tooltip="true"  prop="fileName"  :label="$t('huanbaoTable.MSDS.fileName')" >
               <template
                 slot-scope="scope">
                 <span>{{scope.row.fileName}}</span>
               </template>
             </el-table-column>
-            <el-table-column align="center" show-overflow-tooltip="true"  prop="modifyTime"  label="上次修改时间" >
+            <el-table-column align="center" show-overflow-tooltip="true"  prop="modifyTime"  :label="$t('huanbaoTable.MSDS.endTime')" >
               <template
                 slot-scope="scope">
                 <span>{{scope.row.modifyTime}}</span>
@@ -42,18 +42,18 @@
             </el-table-column>
             <el-table-column align="center" fixed="right" label="操作" width="100">
               <template slot-scope="scope">
-                <el-button type="text" size="small" @click="download(scope.row)">下载</el-button>
+                <el-button type="text" size="small" @click="download(scope.row)">{{$t('huanbaoTable.MSDS.download')}}</el-button>
               </template>
             </el-table-column>
           </el-table>
         </el-col>
       </el-row>
       <div class="longcheer_hr" style="margin-top: -10px;">
-          <span class="longcheer_hr_span">SONY项目必交资料</span>
+          <span class="longcheer_hr_span">{{$t('huanbaoTable.OTHER2.SONYinformation')}}</span>
       </div>
       <el-row style="margin-top: 10px;margin-left: 20px">
-        <el-button v-if="type === 'edit'" size="mini" type="primary" plain @click="addSONYFile" >添加新文件</el-button>
-        <el-button v-if="type === 'edit'" size="mini" type="danger"  plain @click="deleteSONYFile">移除</el-button>
+        <el-button v-if="type === 'edit'" size="mini" type="primary" plain @click="addSONYFile" >{{$t('huanbaoTable.MSDS.UploadNewFiles')}}</el-button>
+        <el-button v-if="type === 'edit'" size="mini" type="danger"  plain @click="deleteSONYFile">{{$t('huanbaoTable.MSDS.Remove')}}</el-button>
       </el-row>
       <el-row class="card_row">
         <el-col span="24">
@@ -67,21 +67,21 @@
               type="selection"
               width="35">
             </el-table-column>
-            <el-table-column align="center" show-overflow-tooltip="true"  prop="fileName"  label="文件名" >
+            <el-table-column align="center" show-overflow-tooltip="true"  prop="fileName"  :label="$t('huanbaoTable.MSDS.fileName')" >
               <template
                 slot-scope="scope">
                 <span>{{scope.row.fileName}}</span>
               </template>
             </el-table-column>
-            <el-table-column align="center" show-overflow-tooltip="true"  prop="modifyTime"  label="上次修改时间" >
+            <el-table-column align="center" show-overflow-tooltip="true"  prop="modifyTime"  :label="$t('huanbaoTable.MSDS.endTime')" >
               <template
                 slot-scope="scope">
                 <span>{{scope.row.modifyTime}}</span>
               </template>
             </el-table-column>
-            <el-table-column align="center" fixed="right" label="操作" width="100">
+            <el-table-column align="center" fixed="right" :label="$t('huanbaoTable.detailTable.operating')" width="100">
               <template slot-scope="scope">
-                <el-button type="text" size="small" @click="download(scope.row)">下载</el-button>
+                <el-button type="text" size="small" @click="download(scope.row)">{{$t('huanbaoTable.MSDS.download')}}</el-button>
               </template>
             </el-table-column>
           </el-table>
@@ -89,7 +89,7 @@
       </el-row>
       <span slot="footer" class="dialog-footer">
         <el-button v-if="type === 'edit'" size="mini" @click="specialNeedsDialog = false">{{$t('huanbaoTable.escapeClause.cancel')}}</el-button>
-        <el-button v-if="type === 'view'" size="mini" @click="specialNeedsDialog = false">关闭</el-button>
+        <el-button v-if="type === 'view'" size="mini" @click="specialNeedsDialog = false">{{$t('tagsView.close')}}</el-button>
         <el-button v-if="type === 'edit'" :loading="$store.getters.loading" size="mini" type="primary" @click="completeGeneralStatement">{{$t('huanbaoTable.escapeClause.ensure')}}</el-button>
       </span>
       <files-upload ref="fileUpload"
@@ -132,7 +132,9 @@ export default {
       fileSONYPath: '',
       fileLenovoPathArray: [],
       fileSONYPathArray: [],
-      envprotectionDocumentOid: ''
+      envprotectionDocumentOid: '',
+      ifDeleteSONY: 'no',
+      ifDeleteLENOVO: 'no'
     }
   },
   methods: {
@@ -152,6 +154,8 @@ export default {
       this.specialNeedsDialog = true
       this.type = type
       this.oid = oid
+      this.ifDeleteSONY = 'no'
+      this.ifDeleteLENOVO = 'no'
       this.getDataList(this.oid)
     },
     getDataList (oid) {
@@ -164,7 +168,7 @@ export default {
     },
     addLenovoFile () {
       this.$refs.fileUpload.openDialog()
-      this.$refs.fileUpload.setAttribute('http://172.16.9.169:8080/files/upLoad', [], '联想项目必交资料', 'fileList', {
+      this.$refs.fileUpload.setAttribute(this.$store.state.filePath + '/files/upLoad', [], '联想项目必交资料', 'fileList', {
         number: this.$store.getters.huanbaoNum,
         userName: this.$store.getters.userInfo.username
       }, 'Lenovo')
@@ -184,6 +188,7 @@ export default {
        } */
     },
     deleteLenovoFile () {
+      this.ifDeleteLENOVO = 'yes'
       var that = this
       for (let i in that.totalReport) {
         for (let j in that.totalReportBefore) {
@@ -209,7 +214,7 @@ export default {
     },
     addSONYFile () {
       this.$refs.fileUpload.openDialog()
-      this.$refs.fileUpload.setAttribute('http://172.16.9.169:8080/files/upLoad', [], 'SONY项目必交资料', 'fileList', {
+      this.$refs.fileUpload.setAttribute(this.$store.state.filePath + '/files/upLoad', [], 'SONY项目必交资料', 'fileList', {
         number: this.$store.getters.huanbaoNum,
         userName: this.$store.getters.userInfo.username
       }, 'SONY')
@@ -229,6 +234,7 @@ export default {
       } */
     },
     deleteSONYFile () {
+      this.ifDeleteSONY = 'yes'
       var that = this
       for (let i in that.totalReport2) {
         for (let j in that.totalReport2Before) {
@@ -256,11 +262,13 @@ export default {
       this.$store.commit('SET_LOADING', true)
       this.specialNeedsDialog = false
       var that = this
-      if (that.totalReportBefore.length > 0) {
-        for (let i in that.fileLenovoPathArray) {
-          for (let j in that.totalReportBefore) {
-            if (that.fileLenovoPathArray[i].fileName === that.totalReportBefore[j].fileName) {
-              that.fileLenovoPathArray.splice(i, 1)
+      if (this.ifDeleteLENOVO === 'yes') {
+        if (that.totalReportBefore.length > 0) {
+          for (let i in that.fileLenovoPathArray) {
+            for (let j in that.totalReportBefore) {
+              if (that.fileLenovoPathArray[i].fileName === that.totalReportBefore[j].fileName) {
+                that.fileLenovoPathArray.splice(i, 1)
+              }
             }
           }
         }
@@ -268,11 +276,13 @@ export default {
       that.fileLenovoPathArray.forEach(function (value, index) {
         that.fileLenovoPath += value.filePath + '@@@'
       })
-      if (that.totalReport2Before.length > 0) {
-        for (let i in that.fileSONYPathArray) {
-          for (let j in that.totalReport2Before) {
-            if (that.fileSONYPathArray[i].fileName === that.totalReport2Before[j].fileName) {
-              that.fileSONYPathArray.splice(i, 1)
+      if (this.ifDeleteSONY === 'yes') {
+        if (that.totalReport2Before.length > 0) {
+          for (let i in that.fileSONYPathArray) {
+            for (let j in that.totalReport2Before) {
+              if (that.fileSONYPathArray[i].fileName === that.totalReport2Before[j].fileName) {
+                that.fileSONYPathArray.splice(i, 1)
+              }
             }
           }
         }
@@ -284,7 +294,7 @@ export default {
         if (r.data.status === 'success') {
           this.$props.updateOther2Data()
           this.$message.success({
-            message: '编辑成功'
+            message: this.$t('success.update_success')
           })
         } else {
           this.$message.error({
@@ -299,48 +309,35 @@ export default {
      */
     returnFilePath (e, type) {
       this.$refs.fileUpload.closeDialog()
-      if (type === 'Lenovo') {
-        this.fileName = e[0].name
-        this.fileLenovoPathArray.push({
-          filePath: e[0].response.data[0],
-          fileName: e[0].name
-        })
-        this.totalReport.push({
-          filePath: e[0].response.data[0],
-          fileName: this.fileName,
-          modifyTime: ''
-        })
-        /* this.fileLenovoName = e[0].name
-        this.fileLenovoPath = e[0].response.data[0] + ',' + this.fileLenovoPath
-        this.fileLenovoPath = this.fileLenovoPath.substring(0, this.fileLenovoPath.length - 1)
-        this.totalReport.push({
-          fileName: this.fileLenovoName,
-          modifyTime: ''
-        }) */
-      }
-      if (type === 'SONY') {
-        this.fileName = e[0].name
-        this.fileSONYPathArray.push({
-          filePath: e[0].response.data[0],
-          fileName: e[0].name
-        })
-        this.totalReport2.push({
-          filePath: e[0].response.data[0],
-          fileName: this.fileName,
-          modifyTime: ''
-        })
-        /* this.fileSONYName = e[0].name
-        this.fileSONYPath = e[0].response.data[0] + ',' + this.fileSONYPath
-        this.fileSONYPath = this.fileSONYPath.substring(0, this.fileSONYPath.length - 1)
-        this.totalReport2.push({
-          fileName: this.fileSONYName,
-          modifyTime: ''
-        }) */
+      for (let i in e) {
+        if (type === 'Lenovo') {
+          this.fileLenovoPathArray.push({
+            filePath: e[i].path,
+            fileName: e[i].name
+          })
+          this.totalReport.push({
+            filePath: e[i].path,
+            fileName: e[i].name,
+            modifyTime: ''
+          })
+        }
+        if (type === 'SONY') {
+          this.fileName = e[0].name
+          this.fileSONYPathArray.push({
+            filePath: e[i].path,
+            fileName: e[i].name
+          })
+          this.totalReport2.push({
+            filePath: e[i].path,
+            fileName: e[i].name,
+            modifyTime: ''
+          })
+        }
       }
     },
     download (row) {
       downloadAttach(row.oid).then(r => {
-        window.open('http://172.16.9.169:8080/files/getFile?route=' + r.data.filePath + '&userName=' + this.$store.getters.userInfo.username, '_blank')
+        window.open(this.$store.state.filePath + '/files/getFile?route=' + encodeURIComponent(r.data.filePath) + '&userName=' + this.$store.getters.userInfo.username, '_blank')
       })
     }
   }
@@ -362,8 +359,8 @@ export default {
     background-image: url(../../assets/image/tab2.png);
     background-repeat: no-repeat;
     background-size: 95% 100%;
-    width: 200px;
-    padding: 5px 15px;
+    padding: 5px 30px 0px 15px;
+    width: auto;
     height: 27px;
     color: #ffffff;
   }

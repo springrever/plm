@@ -5,9 +5,9 @@
     </div>
     <el-row style="margin-top: 5px;margin-left: 10px">
       <el-col :span="24">
-        <el-form ref="form1" :rules="rules" label-position="left" size="mini" :model="tmp" label-width="140px">
+        <el-form ref="form1" :rules="rules" label-position="left" size="mini" :model="tmp" :label-width="$store.getters.guojihua==='en'?'200px':'140px'">
           <el-row style="margin-top: 20px;margin-left: 20px">
-            <el-col :span="10">
+            <el-col :span="$store.getters.guojihua==='en'?'14':'10'">
               <el-form-item prop="ecrTypeValue" :label="$t('pcn.form.ChangeType')">
                 <el-select disabled="true" style="width: 100%" v-model="tmp.ecrTypeValue" placeholder="请选择">
                   <el-option
@@ -22,20 +22,22 @@
                 <el-input disabled="true" v-model="tmp.ecrNum"></el-input>
               </el-form-item>
               <el-form-item prop="ecrName" :label="$t('pcn.form.Name')">
-                <el-input :disabled="!iflag" v-model="tmp.ecrName"></el-input>
+                <el-input :readonly="!iflag" v-model="tmp.ecrName"></el-input>
               </el-form-item>
+              <div v-show="false">
               <el-form-item prop="LQ_PROJECT" :label="$t('pcn.form.project')">
-                <el-input :disabled="!iflag" v-model="tmp.requestProject"></el-input>
+                <el-input  v-model="tmp.requestProject"></el-input>
               </el-form-item>
-              <el-form-item prop="resourceEngineer" :label="$t('pcn.form.ResourceEngineer')">
-                <el-input :disabled="!iflag" v-model="tmp.resourceEngineer" readonly="true">
+              </div>
+              <el-form-item prop="resourceEngineerZH" :label="$t('pcn.form.ResourceEngineer')">
+                <el-input  v-model="tmp.resourceEngineerZH" readonly="true">
                   <el-button :disabled="!iflag" @click="escapeClick"  slot="append" icon="el-icon-search"></el-button>
                 </el-input>
               </el-form-item>
               <el-form-item prop="needDate" :label="$t('pcn.form.RequireCompletionTime')">
                 <el-date-picker
                   style="width: 100%"
-                  :disabled="!iflag"
+                  :readonly="!iflag"
                   value-format="yyyy/MM/dd"
                   v-model="tmp.needDate"
                   type="date"
@@ -43,22 +45,25 @@
                 </el-date-picker>
               </el-form-item>
               <el-form-item prop="reasonDescription" :label="$t('pcn.form.DetailedDescription')">
-                <el-input :disabled="!iflag" type="textarea" v-model="tmp.description"></el-input>
+                <el-input :readonly="!iflag" type="textarea" v-model="tmp.description"></el-input>
+              </el-form-item>
+              <el-form-item prop="comment" :label="$t('pcn.form.comment')">
+                <el-input readonly="true" type="textarea" v-model="comment"></el-input>
               </el-form-item>
             </el-col>
           </el-row>
           <div class="longcheer_hr" style="margin-left: -10px">
-            <span class="longcheer_hr_span">文件</span>
+            <span class="longcheer_hr_span">{{$t('supplement.fengyang.file')}}</span>
           </div>
           <el-button-group style="margin-top: 10px">
-            <el-button v-if="iflag" size="mini" :loading="$store.getters.loading" icon="el-icon-plus" @click="filesUploadClick">上传文件</el-button>
+            <el-button v-if="iflag" size="mini" :loading="$store.getters.loading" icon="el-icon-plus" @click="filesUploadClick">{{$t('supplement.fengyang.UploadFiles')}}</el-button>
             <el-button v-if="iflag" size="mini" :loading="$store.getters.loading" icon="el-icon-delete" @click="removeRelatedWLFYDocs">{{$t('fengyangTable.detail.remove')}}</el-button>
             <el-table
               size="mini"
               :data="filesList"
               border
               ref="multipleTable"
-              height="200px"
+              :height="filesList.length === 0 ? '100': '200'"
               @selection-change="handleSelectionChange"
               style="width: 100%">
               <el-table-column
@@ -66,10 +71,10 @@
                 type="selection"
                 width="55">
               </el-table-column>
-              <el-table-column   align="center" :show-overflow-tooltip="true"   prop="number"  label="标签或文件名" width="650">
+              <el-table-column   align="center" :show-overflow-tooltip="true"   prop="number"  :label="$t('supplement.fengyang.LabelOrFilename')" width="650">
                 <template
                   slot-scope="scope">
-                  {{$t(scope.row.name)}}
+                  <a @click="downFile(scope.row)" style="color: blue;">{{$t(scope.row.name)}}</a>
                 </template>
               </el-table-column>
               <!--<el-table-column align="center" :show-overflow-tooltip="true"   prop="version"  label="附件说明" width="180">-->
@@ -82,7 +87,7 @@
           </el-button-group>
           <div v-if="iflag" style="text-align: right">
             <el-button size="mini" :loading="$store.getters.loading" type="primary" @click="onSubmit">提交</el-button>
-            <el-button size="mini">取消</el-button>
+            <el-button size="mini" @click="dialogFormVisible=false">取消</el-button>
           </div>
         </el-form>
       </el-col>
@@ -94,7 +99,7 @@
 <script>
 import ResourceEngineer from '@/components/PcnDialog/ResourceEngineer'
 import filesUpload from '../../components/filesUpload/index'
-import { resourceEngineer, ecrType, editEcr, reworkEcrInfo } from '@/api/pcn'
+import { resourceEngineer, ecrComments, ecrType, editEcr, reworkEcrInfo, downAttach } from '@/api/pcn'
 export default {
   name: 'pcnUpdate',
   props: ['restData'],
@@ -113,6 +118,8 @@ export default {
         this.iflag = false
       }
       this.dialogFormVisible = true
+      this.filesList = []
+      this.removeFilesList = []
       this.ecrOid = ecrOid
       this.taskOid = taskOid
       this.getReworkEcrInfo(ecrOid)
@@ -121,26 +128,38 @@ export default {
       console.log()
       this.$props.restData(r.data.oid)
     },
+    downFile (d) {
+      downAttach(this.ecrOid, d.attachOid).then(r => {
+        if (r.data.filePath) {
+          window.open(this.$store.state.filePath + '/files/getFile?route=' + encodeURIComponent(r.data.filePath) + '&userName=' + this.$store.getters.userInfo.username, '_blank')
+        }
+      })
+    },
     removeRelatedWLFYDocs () {
       var that = this
+      console.log('submitFilesList', that.submitFilesList)
       this.selectionList.forEach(function (v, i) {
-        console.log(that.filesList)
+        // 判断文件删除
+        if (v.ftype === 'oid') {
+          that.removeFilesList.push(v)
+        } else {
+          that.submitFilesList.splice(that.submitFilesList.indexOf(v), 1)
+        }
         that.filesList.splice(that.filesList.indexOf(v), 1)
       })
     },
     selectResourceEngineer (value) {
       this.tmp.sourceEngineer = value.userName
-      this.tmp.sourceEngineerName = value.fullName
+      this.tmp.resourceEngineerZH = value.fullName
     },
     handleSelectionChange (data) {
       if (data) {
         this.selectionList = data
-        console.log('当前选择文件数组:', this.selectionList)
       }
     },
     filesUploadClick () {
       this.$refs.fup.openDialog()
-      this.$refs.fup.setAttribute('http://172.16.9.169:8080/files/upLoad', [], '', 'fileList', {number: this.materialNumber, userName: this.$store.getters.userInfo.username})
+      this.$refs.fup.setAttribute(this.$store.state.filePath + '/files/upLoad', [], '', 'fileList', {number: new Date().getTime(), userName: this.$store.getters.userInfo.username})
     },
     escapeClick: function () {
       this.$refs.dialogRef.openDialog()
@@ -149,8 +168,9 @@ export default {
       console.log('xxoo', data)
       var that = this
       data.forEach(function (value, index) {
-        var path = value.response.data[0]
-        that.filesList.push({name: value.name, filepath: path, url: '', desc: '', ftype: 'new'})
+        var path = value.path
+        that.filesList.push({name: value.name, attachOid: value.attachOid, filepath: path, url: '', desc: '', ftype: 'new'})
+        that.submitFilesList.push({name: value.name, attachOid: value.attachOid, filepath: path, url: '', desc: '', ftype: 'new'})
       })
       this.$refs.fup.closeDialog()
     },
@@ -169,19 +189,24 @@ export default {
         this.options = sz
       })
     },
+    getEcrComments () {
+      ecrComments(this.ecrOid).then(r => {
+        this.comment = r.data.comment
+      })
+    },
     onSubmit () {
       this.$refs['form1'].validate((valid) => {
         if (valid) {
           var jsonData = {}
-          jsonData.taskOid = this.ecrOid
-          jsonData.ecrOid = this.taskOid
+          jsonData.taskOid = this.taskOid
+          jsonData.ecrOid = this.ecrOid
           jsonData.name = this.tmp.ecrName
           jsonData.needDate = this.tmp.needDate
           jsonData.LQ_PROJECT = this.tmp.requestProject
-          jsonData.sourceEngineer = this.tmp.resourceEngineer
+          jsonData.sourceEngineer = this.tmp.sourceEngineer
           jsonData.reasonDescription = this.tmp.description
-          jsonData.removeOid = ''
-          jsonData.addPath = ''
+          jsonData.removeOid = this.getFilePath(this.removeFilesList)
+          jsonData.addPath = this.getFilePath2(this.submitFilesList)
           this.$store.commit('SET_LOADING', true)
           editEcr(JSON.stringify(jsonData)).then(r => {
             console.log('r->', r)
@@ -193,6 +218,7 @@ export default {
                 duration: 5 * 1000
               })
               this.tmp = {ecrType: '', sourceEngineerName: ''}
+              this.$props.restData()
               this.$refs['form1'].clearValidate()
             } else {
               this.$message({
@@ -208,16 +234,34 @@ export default {
         }
       })
     },
-    getFilePath () {
+    getFilePath (dataList) {
+      console.log('dataList-->', dataList)
       var str = ''
-      this.filesList.forEach(function (v, i) {
+      dataList.forEach(function (v, i) {
+        str = str + v.attachOid + '@@@'
+      })
+      return str
+    },
+    getFilePath2 (dataList) {
+      console.log('dataList-->', dataList)
+      var str = ''
+      dataList.forEach(function (v, i) {
         str = str + v.filepath + '@@@'
       })
       return str
     },
     getReworkEcrInfo (oid) {
+      this.tmp = {ecrType: '', resourceEngineerZH: ''}
       reworkEcrInfo(oid).then(r => {
+        var that = this
         this.tmp = r.data
+        this.tmp.sourceEngineer = r.data.resourceEngineer
+        r.data.attachs.forEach(function (value, index) {
+          // that.filePath += value.response.data[0] + ';'
+          that.filesList.push({name: value.fileName, attachOid: value.attachOid, filepath: '', url: '', desc: '', ftype: 'oid'})
+          // that.submitFilesList.push({name: value.fileName, attachOid: value.attachOid, filepath: '', url: '', desc: '', ftype: 'oid'})
+        })
+        this.getEcrComments()
       })
     }
   },
@@ -226,8 +270,11 @@ export default {
       dialogFormVisible: false,
       ecrOid: '',
       taskOid: '',
-      iflag: true,
-      tmp: {ecrType: '', sourceEngineerName: ''},
+      iflag: false,
+      comment: '',
+      tmp: {ecrType: '', resourceEngineerZH: '', comment: ''},
+      removeFilesList: [],
+      submitFilesList: [],
       submitPath: '',
       filesList: [],
       rules: {
@@ -240,7 +287,7 @@ export default {
         ecrNumber: [
           { required: true, message: this.$t('error.required'), trigger: 'blur' }
         ],
-        resourceEngineer: [
+        resourceEngineerZH: [
           { required: true, message: this.$t('error.required'), trigger: 'blur' }
         ],
         needDate: [
@@ -265,8 +312,8 @@ export default {
     background-image: url(../../assets/image/tab2.png);
     background-repeat: no-repeat;
     background-size: 95% 100%;
-    width: 120px;
-    padding: 5px 15px;
+    padding: 5px 30px 0px 15px;
+    width: auto;
     height: 27px;
     color: #ffffff;
   }

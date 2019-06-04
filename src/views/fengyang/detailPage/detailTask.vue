@@ -106,10 +106,10 @@
             </el-row>
             <el-row class="card_row">
               <el-col :span="4" class="card_lable">
-                {{$t('fengyangTable.detail.approveddate')}}:
+                <span style="background-color: red;color: white;">{{$t('fengyangTable.detail.approveddate')}}:</span>
               </el-col>
               <el-col :span="7" class="card_value">&nbsp;
-                {{model.approveddate}}
+                <span style="color: red">{{model.approveddate}}</span>
               </el-col>
               <el-col :span="4" class="card_lable">
                 {{$t('fengyangTable.detail.lq_supplier_rank')}}:
@@ -218,7 +218,7 @@
             </el-row>
             <el-row class="card_row" style="margin-top: 30px">
               <el-col :span="11" class="card_lable">
-               <a style="color: blue" @click="Acknowledgment">生成的承认书EXCEL附件</a>
+               <a style="color: blue" @click="Acknowledgment">{{$t('supplement.fengyang.downExcel')}}</a>
               </el-col>
               <el-col :span="13" class="card_lable">
 
@@ -247,19 +247,19 @@
                     type="selection"
                     width="55">
                   </el-table-column>
-                  <el-table-column align="center" :show-overflow-tooltip="true"   prop="number"  :label="$t('TableTile.files.number')" width="180">
-                    <template
-                      slot-scope="scope">
-                      {{scope.row.number}}
-                    </template>
-                  </el-table-column>
+                  <!--<el-table-column align="center" :show-overflow-tooltip="true"   prop="number"  :label="$t('TableTile.files.number')" width="180">-->
+                    <!--<template-->
+                      <!--slot-scope="scope">-->
+                      <!--{{scope.row.number}}-->
+                    <!--</template>-->
+                  <!--</el-table-column>-->
                   <el-table-column v-if="false" align="center" :show-overflow-tooltip="true"   prop="version"  :label="$t('TableTile.files.version')" width="180">
                     <template
                       slot-scope="scope">
                       {{scope.row.version}}
                     </template>
                   </el-table-column>
-                  <el-table-column align="center" :show-overflow-tooltip="true"   prop="name"  :label="$t('TableTile.files.name')" width="180">
+                  <el-table-column align="center" :show-overflow-tooltip="true"   prop="name"  :label="$t('TableTile.files.name')" width="220">
                     <template
                       slot-scope="scope">
                       {{scope.row.name}}
@@ -308,7 +308,7 @@
               <span class="longcheer_hr_span">{{$t('formButton.Approval')}}</span>
             </div>
             <el-row v-if="state === 'true'" class="card_row">
-              <el-col span="4" style="text-align: right">备注：</el-col>
+              <el-col span="4" style="text-align: right">{{$t('supplement.fengyang.remark')}}：</el-col>
               <el-col span="1" style="text-align: right">&nbsp;</el-col>
               <el-col  span="12"><el-input  :disabled="state !== 'true'" v-model="model.comment" type="textarea" :rows="3"></el-input></el-col>
             </el-row>
@@ -429,14 +429,15 @@ export default {
     Acknowledgment () {
       downloadAcknowledgment('MS' + this.model.materialNumber).then(r => {
         console.log(r)
-        if (!r.data.flag || r.data.flag === false) {
+        var mesg = this.$store.getters.guojihua === 'zh' ? r.data.zh : r.data.en
+        if (r.data.state === 'failed') {
           this.$message({
-            message: r.data.filePath,
+            message: mesg,
             type: 'warning',
             duration: 5 * 1000
           })
         } else if (!r.data.flag || r.data.flag === true) {
-          window.open('http://172.16.9.169:8080/files/getFile?route=' + r.data.filePath + '&userName=' + this.$store.getters.userInfo.username, '_blank')
+          window.open(this.$store.state.filePath + '/files/getFile?route=' + encodeURIComponent(r.data.filePath) + '&userName=' + this.$store.getters.userInfo.username, '_blank')
         }
       })
     },
@@ -447,8 +448,7 @@ export default {
     },
     attachmentClick (number, name) {
       attachmentLink(number, name).then(r => {
-        console.log(r)
-        window.open('http://172.16.9.169:8080/files/getFile?route=' + r.data.filePath + '&userName=' + this.$store.getters.userInfo.username, '_blank')
+        window.open(this.$store.state.filePath + '/files/getFile?route=' + encodeURIComponent(r.data.filePath) + '&userName=' + this.$store.getters.userInfo.username, '_blank')
       })
     },
     fileseditClick () {
@@ -557,9 +557,10 @@ export default {
       this.$store.commit('SET_LOADING', true)
       removeRelatedWLFYDocs('MS' + this.model.materialNumber, this.filesOids).then(r => {
         console.log(r)
-        if (r.data.mes === '移除成功！') {
+        var mesg = this.$store.getters.guojihua === 'zh' ? r.data.zh : r.data.en
+        if (r.data.state === 'success') {
           this.$message({
-            message: this.$t('success.remove_success'),
+            message: mesg,
             type: 'success',
             duration: 5 * 1000
           })
@@ -567,7 +568,7 @@ export default {
           this.updatedoc(r.data.oid)
         } else {
           this.$message({
-            message: '' + r.data.mes,
+            message: mesg,
             type: 'warning',
             duration: 5 * 1000
           })
@@ -578,21 +579,23 @@ export default {
       this.$store.commit('SET_LOADING', true)
       completeSealedTask('MS' + this.model.materialNumber, this.model.comment, this.radio).then(r => {
         console.log(r)
-        if (r.data.mes.indexOf('成功') !== -1) {
+        var mesg = this.$store.getters.guojihua === 'zh' ? r.data.zh : r.data.en
+        if (r.data.state !== 'failed') {
           this.$message({
-            message: this.$t('success.finsh_task_success'),
+            message: mesg,
             type: 'success',
             duration: 5 * 1000
           })
           this.closePage()
         } else {
           this.$message({
-            message: r.data.mes,
+            message: mesg,
             dangerouslyUseHTMLString: true,
             type: 'warning',
             duration: 5 * 1000
           })
         }
+        this.getDetailInfo(this.oid)
       })
     },
     closePage () {
@@ -624,7 +627,8 @@ export default {
       selectCount: 0,
       filesOids: '',
       checkedone: {},
-      stateName: ''
+      stateName: '',
+      approvalTable: []
     }
   }
 }
@@ -665,10 +669,11 @@ export default {
     display: inline-block;
     background-image: url(../../../assets/image/tab2.png);
     background-repeat: no-repeat;
-    background-size: 95% 100%;
-    width: 120px;
-    padding: 5px 15px;
+    background-size: 98% 100%;
+    /*padding: 5px 30px;*/
     height: 27px;
+    padding: 5px 30px 0px 15px;
+    width: auto;
     color: #ffffff;
   }
   .longcheer_hr_reight {

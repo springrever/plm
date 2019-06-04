@@ -14,7 +14,7 @@
       </div>
       <el-row :gutter="20" v-if="isSub === 'NOSUB'">
         <el-col :span="24">
-          <el-form size="mini" ref="dataForm" :model="temp" label-position="left" label-width="100px"
+          <el-form size="mini" ref="dataForm" :model="temp" label-position="left" label-width="180px"
                    style=' margin-left:0px;'>
             <el-row :gutter="100" type="flex" class="row-bg" style="height: 40px;margin-left: 20px;margin-top: 10px">
               <el-col :span="16">
@@ -76,7 +76,7 @@
       </el-row>
       <el-row :gutter="20" v-if="isSub === 'SUB'">
         <el-col :span="24">
-          <el-form size="mini" ref="dataForm" :model="temp" label-position="left" label-width="100px"
+          <el-form size="mini" ref="dataForm" :model="temp" label-position="left" label-width="180px"
                    style=' margin-left:0px;'>
             <el-row :gutter="100" type="flex" class="row-bg" style="height: 40px;margin-left: 20px;margin-top: 10px">
               <el-col :span="16">
@@ -125,7 +125,7 @@
             <el-row :gutter="100" type="flex" class="row-bg" style="height: 40px;margin-left: 20px;margin-top: 10px">
               <el-col :span="16">
                 <el-form-item prop="exemptions" :label="$t('huanbaoTable.FMD.exemptions')">
-                  <el-input readonly="true" v-model="temp.exemptions">
+                  <el-input readonly="true" v-model="exemptions">
                     <el-button @click="escapeClick"  slot="append" icon="el-icon-search"></el-button>
                   </el-input>
                 </el-form-item>
@@ -158,6 +158,7 @@ export default {
   },
   data () {
     return {
+      exemptions: '',
       isSub: '',
       oid: '',
       dialog: false,
@@ -167,6 +168,7 @@ export default {
   },
   methods: {
     seteditFMDDialogFormVisible (row, oid, sub) {
+      this.exemptions = ''
       this.temp = {}
       this.oid = ''
       this.isSub = ''
@@ -174,16 +176,29 @@ export default {
       this.temp = Object.assign({}, row)
       this.oid = oid
       this.isSub = sub
+      var that = this
+      that.temp.exemptions.forEach(function (v) {
+        that.exemptions += v.exemption + ','
+      })
     },
     completeFMD () {
-      this.dialog = false
+      var types = this.$store.getters.guojihua === 'zh' ? 'Chinese' : 'English'
       if (this.isSub === 'NOSUB') {
-        editMaterial(this.temp).then(r => {
+        editMaterial(this.temp, types).then(r => {
           if (r.data.status === 'success') {
+            this.dialog = false
             this.$props.getDataList(this.oid)
-            this.$message.success({
-              message: '修改数据成功'
-            })
+            if (r.data.hasOwnProperty('warning')) {
+              this.$message.warning({
+                dangerouslyUseHTMLString: true,
+                message: r.data.warning
+              })
+            } else {
+              this.$message.success({
+                dangerouslyUseHTMLString: true,
+                message: this.$t('success.update_success')
+              })
+            }
           } else {
             this.$message.error({
               message: r.data.info
@@ -191,12 +206,21 @@ export default {
           }
         })
       } else {
-        editSubstance(this.temp).then(r => {
+        editSubstance(this.temp, types).then(r => {
           if (r.data.status === 'success') {
-            this.$props.updateFMDData()
-            this.$message.success({
-              message: '修改数据成功'
-            })
+            this.dialog = false
+            this.$props.getDataList(this.oid)
+            if (r.data.hasOwnProperty('warning')) {
+              this.$message.warning({
+                dangerouslyUseHTMLString: true,
+                message: r.data.warning
+              })
+            } else {
+              this.$message.success({
+                dangerouslyUseHTMLString: true,
+                message: this.$t('success.update_success')
+              })
+            }
           } else {
             this.$message.error({
               message: r.data.info
@@ -211,6 +235,7 @@ export default {
     // 接受子组件传值
     acceptSonValue (e) {
       this.temp.exemptions = e
+      this.exemptions = e
     }
   }
 }
@@ -231,8 +256,8 @@ export default {
     background-image: url(../../assets/image/tab2.png);
     background-repeat: no-repeat;
     background-size: 95% 100%;
-    width: 120px;
-    padding: 5px 15px;
+    padding: 5px 30px 0px 15px;
+    width: auto;
     height: 27px;
     color: #ffffff;
   }

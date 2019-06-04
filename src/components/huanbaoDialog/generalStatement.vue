@@ -10,11 +10,11 @@
       width="50%"
       top="2%">
       <div class="longcheer_hr" style="margin-top: -10px;">
-        <span class="longcheer_hr_span">REACH总声明</span>
+        <span class="longcheer_hr_span">{{$t('huanbaoTable.REACH.statement')}}</span>
       </div>
       <el-row style="margin-top: 10px;margin-left: 20px">
-        <el-button v-if="type === 'edit'" size="mini" type="primary" plain @click="addFile" >添加新文件</el-button>
-        <el-button v-if="type === 'edit'" size="mini" type="danger"  plain @click="deleteFile">移除</el-button>
+        <el-button v-if="type === 'edit'" size="mini" type="primary" plain @click="addFile" >{{$t('huanbaoTable.MSDS.UploadNewFiles')}}</el-button>
+        <el-button v-if="type === 'edit'" size="mini" type="danger"  plain @click="deleteFile">{{$t('huanbaoTable.MSDS.Remove')}}</el-button>
       </el-row>
       <el-row class="card_row">
         <el-col span="24">
@@ -28,21 +28,21 @@
               type="selection"
               width="35">
             </el-table-column>
-            <el-table-column align="center" show-overflow-tooltip="true"  prop="fileName"  label="文件名" >
+            <el-table-column align="center" show-overflow-tooltip="true"  prop="fileName"  :label="$t('huanbaoTable.MSDS.fileName')" >
               <template
                 slot-scope="scope">
                 <span>{{scope.row.fileName}}</span>
               </template>
             </el-table-column>
-            <el-table-column align="center" show-overflow-tooltip="true"  prop="modifyTime"  label="上次修改时间" >
+            <el-table-column align="center" show-overflow-tooltip="true"  prop="modifyTime"  :label="$t('huanbaoTable.MSDS.endTime')" >
               <template
                 slot-scope="scope">
                 <span>{{scope.row.modifyTime}}</span>
               </template>
             </el-table-column>
-            <el-table-column align="center" fixed="right" label="操作" width="100">
+            <el-table-column align="center" fixed="right" :label="$t('huanbaoTable.detailTable.operating')" >
               <template slot-scope="scope">
-                <el-button type="text" size="small" @click="upload(scope.row)">下载</el-button>
+                <el-button type="text" size="small" @click="upload(scope.row)">{{$t('huanbaoTable.MSDS.download')}}</el-button>
               </template>
             </el-table-column>
           </el-table>
@@ -50,7 +50,7 @@
       </el-row>
       <span slot="footer" class="dialog-footer">
         <el-button v-if="type === 'edit'" size="mini" @click="generalStatementDialog = false">{{$t('huanbaoTable.escapeClause.cancel')}}</el-button>
-        <el-button v-if="type === 'view'" size="mini" @click="generalStatementDialog = false">关闭</el-button>
+        <el-button v-if="type === 'view'" size="mini" @click="generalStatementDialog = false">{{$t('tagsView.close')}}</el-button>
         <el-button v-if="type === 'edit'" :loading="$store.getters.loading" size="mini" type="primary" @click="completeGeneralStatement">{{$t('huanbaoTable.escapeClause.ensure')}}</el-button>
       </span>
       <files-upload ref="fileUpload"
@@ -85,7 +85,8 @@ export default {
       str2: '',
       fileName: '',
       filePath: '',
-      filePathArray: []
+      filePathArray: [],
+      ifDeleteState: 'no'
     }
   },
   methods: {
@@ -99,6 +100,7 @@ export default {
       this.generalStatementDialog = true
       this.type = type
       this.oid = oid
+      this.ifDeleteState = 'no'
       this.getDataList(this.oid)
     },
     getDataList (oid) {
@@ -109,7 +111,7 @@ export default {
     },
     addFile () {
       this.$refs.fileUpload.openDialog()
-      this.$refs.fileUpload.setAttribute('http://172.16.9.169:8080/files/upLoad', [], '添加总声明', 'fileList', {
+      this.$refs.fileUpload.setAttribute(this.$store.state.filePath + '/files/upLoad', [], '添加总声明', 'fileList', {
         number: this.$store.getters.huanbaoNum,
         userName: this.$store.getters.userInfo.username
       }, 'REACH')
@@ -129,6 +131,7 @@ export default {
       } */
     },
     deleteFile () {
+      this.ifDeleteState = 'yes'
       var that = this
       for (let i in that.totalReport) {
         for (let j in that.totalReportBefore) {
@@ -155,11 +158,13 @@ export default {
     completeGeneralStatement () {
       this.$store.commit('SET_LOADING', true)
       var that = this
-      if (this.totalReportBefore.length > 0) {
-        for (let i in this.filePathArray) {
-          for (let j in this.totalReportBefore) {
-            if (this.filePathArray[i].fileName === this.totalReportBefore[j].fileName) {
-              this.filePathArray.splice(i, 1)
+      if (this.ifDeleteState === 'yes') {
+        if (this.totalReportBefore.length > 0) {
+          for (let i in this.filePathArray) {
+            for (let j in this.totalReportBefore) {
+              if (this.filePathArray[i].fileName === this.totalReportBefore[j].fileName) {
+                this.filePathArray.splice(i, 1)
+              }
             }
           }
         }
@@ -171,13 +176,14 @@ export default {
         if (r.data.status === 'success') {
           this.generalStatementDialog = false
           this.$message.success({
-            message: '编辑完成'
+            message: this.$t('success.update_success')
           })
         } else {
           this.$message.error({
             message: r.data.info
           })
         }
+        this.ifDeleteState = 'no'
       })
     },
     /**
@@ -186,20 +192,21 @@ export default {
      */
     returnFilePath (e, type) {
       this.$refs.fileUpload.closeDialog()
-      this.fileName = e[0].name
-      this.filePathArray.push({
-        filePath: e[0].response.data[0],
-        fileName: e[0].name
-      })
-      this.totalReport.push({
-        filePath: e[0].response.data[0],
-        fileName: this.fileName,
-        modifyTime: ''
-      })
+      for (let i in e) {
+        this.filePathArray.push({
+          filePath: e[i].path,
+          fileName: e[i].name
+        })
+        this.totalReport.push({
+          filePath: e[i].path,
+          fileName: e[i].name,
+          modifyTime: ''
+        })
+      }
     },
     upload (row) {
       downloadAttach(row.oid).then(r => {
-        window.open('http://172.16.9.169:8080/files/getFile?route=' + r.data.filePath + '&userName=' + this.$store.getters.userInfo.username, '_blank')
+        window.open(this.$store.state.filePath + '/files/getFile?route=' + encodeURIComponent(r.data.filePath) + '&userName=' + this.$store.getters.userInfo.username, '_blank')
       })
     }
   }
@@ -221,8 +228,8 @@ export default {
     background-image: url(../../assets/image/tab2.png);
     background-repeat: no-repeat;
     background-size: 95% 100%;
-    width: 200px;
-    padding: 5px 15px;
+    padding: 5px 30px 0px 15px;
+    width: auto;
     height: 27px;
     color: #ffffff;
   }

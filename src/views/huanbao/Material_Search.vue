@@ -26,6 +26,11 @@
                   <el-col :span="8">
                     <el-form-item prop="exemptionForm"  :label="$t('huanbaoTable.search.escape_clause')">
                       <el-input readonly="true" v-model="temp.exemptionForm">
+                        <i
+                          class="el-icon-close el-input__icon"
+                          slot="suffix"
+                          @click="handleIconClick">
+                         </i>
                         <el-button @click="escapeClick"  slot="append" icon="el-icon-search"></el-button>
                       </el-input>
                     </el-form-item>
@@ -109,7 +114,7 @@
           <el-table-column align="center" show-overflow-tooltip="true" prop="number"  :label="$t('huanbaoTable.search.eNumber')" width="180">
             <template
               slot-scope="scope">
-              <span style="color: blue">{{scope.row.number}}</span>
+              <a style="color: blue">{{scope.row.number}}</a>
             </template>
           </el-table-column>
           <el-table-column align="center" show-overflow-tooltip="true" prop="name"  :label="$t('huanbaoTable.search.eName')" width="180">
@@ -145,7 +150,7 @@
           <el-table-column align="center" show-overflow-tooltip="true" prop="FMD"  :label="$t('huanbaoTable.submitted.FMD')" width="100">
             <template
               slot-scope="scope">
-              <el-button v-if="scope.row.FMD === 'RELEASED'" :title="$t('huanbaoTable.submitted.FMD')" type="success" circle></el-button>
+              <el-button v-if="scope.row.FMD === 'RELEASED'" :title="$t('huanbaoTable.submitted.RELEASED')" type="success" circle></el-button>
               <el-button v-if="scope.row.FMD === 'REWORK'" :title="$t('huanbaoTable.submitted.REWORK')" type="danger" circle></el-button>
               <el-button v-if="scope.row.FMD === 'UNDERREVIEW'" :title="$t('huanbaoTable.submitted.UNDERREVIEW')" type="warning" circle></el-button>
               <el-button v-if="scope.row.FMD === 'INWORK'" :title="$t('huanbaoTable.submitted.INWORK')" style="background-color: #909399;"  circle></el-button>
@@ -154,7 +159,7 @@
           <el-table-column align="center" show-overflow-tooltip="true" prop="MSDS"  :label="$t('huanbaoTable.submitted.MSDS')" width="150">
             <template
               slot-scope="scope">
-              <el-button v-if="scope.row.MSDS === 'RELEASED'" :title="$t('huanbaoTable.submitted.FMD')" type="success" circle></el-button>
+              <el-button v-if="scope.row.MSDS === 'RELEASED'" :title="$t('huanbaoTable.submitted.RELEASED')" type="success" circle></el-button>
               <el-button v-if="scope.row.MSDS === 'REWORK'" :title="$t('huanbaoTable.submitted.REWORK')" type="danger" circle></el-button>
               <el-button v-if="scope.row.MSDS === 'UNDERREVIEW'" :title="$t('huanbaoTable.submitted.UNDERREVIEW')" type="warning" circle></el-button>
               <el-button v-if="scope.row.MSDS === 'INWORK'" :title="$t('huanbaoTable.submitted.INWORK')" style="background-color: #909399;"  circle></el-button>
@@ -163,7 +168,7 @@
           <el-table-column align="center" show-overflow-tooltip="true" prop="RoHS"  :label="$t('huanbaoTable.submitted.RoHS')" width="100">
             <template
               slot-scope="scope">
-              <el-button v-if="scope.row.RoHS === 'RELEASED'" :title="$t('huanbaoTable.submitted.FMD')" type="success" circle></el-button>
+              <el-button v-if="scope.row.RoHS === 'RELEASED'" :title="$t('huanbaoTable.submitted.RELEASED')" type="success" circle></el-button>
               <el-button v-if="scope.row.RoHS === 'REWORK'" :title="$t('huanbaoTable.submitted.REWORK')" type="danger" circle></el-button>
               <el-button v-if="scope.row.RoHS === 'UNDERREVIEW'" :title="$t('huanbaoTable.submitted.UNDERREVIEW')" type="warning" circle></el-button>
               <el-button v-if="scope.row.RoHS === 'INWORK'" :title="$t('huanbaoTable.submitted.INWORK')" style="background-color: #909399;"  circle></el-button>
@@ -172,7 +177,7 @@
           <el-table-column align="center" show-overflow-tooltip="true" prop="HF"  :label="$t('huanbaoTable.submitted.HF')" width="100">
             <template
               slot-scope="scope">
-              <el-button v-if="scope.row.HF === 'RELEASED'" :title="$t('huanbaoTable.submitted.FMD')" type="success" circle></el-button>
+              <el-button v-if="scope.row.HF === 'RELEASED'" :title="$t('huanbaoTable.submitted.RELEASED')" type="success" circle></el-button>
               <el-button v-if="scope.row.HF === 'REWORK'" :title="$t('huanbaoTable.submitted.REWORK')" type="danger" circle></el-button>
               <el-button v-if="scope.row.HF === 'UNDERREVIEW'" :title="$t('huanbaoTable.submitted.UNDERREVIEW')" type="warning" circle></el-button>
               <el-button v-if="scope.row.HF === 'INWORK'" :title="$t('huanbaoTable.submitted.INWORK')" style="background-color: #909399;"  circle></el-button>
@@ -181,7 +186,7 @@
           <el-table-column align="center" show-overflow-tooltip="true" prop="REACH"  :label="$t('huanbaoTable.submitted.REACH')" width="100">
             <template
               slot-scope="scope">
-              <el-button v-if="scope.row.REACH === 'RELEASED'" :title="$t('huanbaoTable.submitted.FMD')" type="success" circle></el-button>
+              <el-button v-if="scope.row.REACH === 'RELEASED'" :title="$t('huanbaoTable.submitted.RELEASED')" type="success" circle></el-button>
               <el-button v-if="scope.row.REACH === 'REWORK'" :title="$t('huanbaoTable.submitted.REWORK')" type="danger" circle></el-button>
               <el-button v-if="scope.row.REACH === 'UNDERREVIEW'" :title="$t('huanbaoTable.submitted.UNDERREVIEW')" type="warning" circle></el-button>
               <el-button v-if="scope.row.REACH === 'INWORK'" :title="$t('huanbaoTable.submitted.INWORK')" style="background-color: #909399;"  circle></el-button>
@@ -190,7 +195,7 @@
           <el-table-column align="center" show-overflow-tooltip="true" prop="OTHER"  :label="$t('huanbaoTable.submitted.OTHER')" width="100">
             <template
               slot-scope="scope">
-              <el-button v-if="scope.row.OTHER === 'RELEASED'" :title="$t('huanbaoTable.submitted.FMD')" type="success" circle></el-button>
+              <el-button v-if="scope.row.OTHER === 'RELEASED'" :title="$t('huanbaoTable.submitted.RELEASED')" type="success" circle></el-button>
               <el-button v-if="scope.row.OTHER === 'REWORK'" :title="$t('huanbaoTable.submitted.REWORK')" type="danger" circle></el-button>
               <el-button v-if="scope.row.OTHER === 'UNDERREVIEW'" :title="$t('huanbaoTable.submitted.UNDERREVIEW')" type="warning" circle></el-button>
               <el-button v-if="scope.row.OTHER === 'INWORK'" :title="$t('huanbaoTable.submitted.INWORK')" style="background-color: #909399;"  circle></el-button>
@@ -199,21 +204,23 @@
           <el-table-column align="center" show-overflow-tooltip="true" prop="OTHER2"  :label="$t('huanbaoTable.submitted.OTHER2')" width="150">
             <template
               slot-scope="scope">
-              <el-button v-if="scope.row.OTHER2 === 'RELEASED'" :title="$t('huanbaoTable.submitted.FMD')" type="success" circle></el-button>
+              <el-button v-if="scope.row.OTHER2 === 'RELEASED'" :title="$t('huanbaoTable.submitted.RELEASED')" type="success" circle></el-button>
               <el-button v-if="scope.row.OTHER2 === 'REWORK'" :title="$t('huanbaoTable.submitted.REWORK')" type="danger" circle></el-button>
               <el-button v-if="scope.row.OTHER2 === 'UNDERREVIEW'" :title="$t('huanbaoTable.submitted.UNDERREVIEW')" type="warning" circle></el-button>
               <el-button v-if="scope.row.OTHER2 === 'INWORK'" :title="$t('huanbaoTable.submitted.INWORK')" style="background-color: #909399;"  circle></el-button>
             </template>
           </el-table-column>
         </el-table>
-        <el-pagination
-          background
-          @current-change="handleCurrentChange"
-          :current-page="counts.nowPage"
-          layout="total, prev, pager, next"
-          :total="counts.total"
-          :page-size="counts.pageCount">
-        </el-pagination>
+        <div style="width: 100%;text-align: right">
+          <el-pagination
+            background
+            @current-change="handleCurrentChange"
+            :current-page="counts.nowPage"
+            layout="total, prev, pager, next"
+            :total="counts.total"
+            :page-size="counts.pageCount">
+          </el-pagination>
+        </div>
       </el-card>
       <escape-clause
                       ref="myChild"
@@ -272,6 +279,9 @@ export default {
         }
         this.options = states
       })
+      this.temp.searchDateFrom = ''
+      this.temp.searchDateTo = ''
+      this.getDataList(this.temp, this.counts)
     },
     // 搜索结果
     searchResult () {
@@ -303,7 +313,7 @@ export default {
       this.$refs.myChild.setDialogFormVisible()
     },
     cellClick (row, column, cell, event) {
-      this.$router.push({name: 'detailTask', params: {oid: row.oid, state: '1', approvalType: ''}})
+      this.$router.push({name: 'detailTask', params: {oid: row.oid, state: row.status, approvalType: ''}})
     },
     handleCurrentChange (val) {
       this.counts.nowPage = val
@@ -312,11 +322,14 @@ export default {
         this.tableData = r.data.result
         this.counts.total = r.data.totalCount
       })
+    },
+    handleIconClick () {
+      this.temp.exemptionForm = ''
     }
   }
 }
 </script>
-<style>
+<style scoped>
   .boxtext {
     font-size: 15px;
   }

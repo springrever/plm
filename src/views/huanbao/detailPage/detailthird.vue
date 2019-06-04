@@ -56,7 +56,7 @@
               <template slot-scope="scope">
                 <el-button @click="toRelatedClick(scope.row)" type="text" size="small">{{$t('formButton.relatedMaterials')}}</el-button>
                 <el-button @click="toEditReport(scope.row)" type="text" size="small">{{$t('formButton.edit')}}</el-button>
-                <el-button @click="downLoad(scope.row)" type="text" size="small">下载</el-button>
+                <el-button @click="downLoad(scope.row)" type="text" size="small">{{$t('huanbaoTable.MSDS.download')}}</el-button>
               </template>
             </el-table-column>
           </el-table>
@@ -212,16 +212,23 @@ export default {
     },
     downLoad (row) {
       downloadAttach(row.reportOid).then(r => {
-        window.open('http://172.16.9.169:8080/files/getFile?route=' + r.data.filePath + '&userName=' + this.$store.getters.userInfo.username, '_blank')
+        window.open(this.$store.state.filePath + '/files/getFile?route=' + encodeURIComponent(r.data.filePath) + '&userName=' + this.$store.getters.userInfo.username, '_blank')
       })
     },
     submitAprive () {
       completeReportTask(this.oid, this.comment, this.radio).then(r => {
         if (r.data.status === 'success') {
           this.$message.success({
-            message: '任务已提交'
+            message: this.$t('success.finsh_task_success')
           })
           this.closePage()
+        } else if (r.data.status === 'fail') {
+          this.$message({
+            message: r.data.info,
+            dangerouslyUseHTMLString: true,
+            type: 'warning',
+            duration: 5 * 1000
+          })
         }
       })
     },

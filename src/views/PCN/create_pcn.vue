@@ -6,9 +6,9 @@
       </div>
       <el-row style="margin-top: 20px;margin-left: 20px">
         <el-col :span="24">
-          <el-form ref="form1" :rules="rules" label-position="left" size="mini" :model="tmp" label-width="140px">
+          <el-form ref="form1" :rules="rules" label-position="left" size="mini" :model="tmp" :label-width="$store.getters.guojihua==='en'?'200px':'140px'">
             <el-row style="margin-top: 20px;margin-left: 20px">
-              <el-col :span="10">
+                <el-col :span="$store.getters.guojihua==='en'?'10':'7'">
                 <el-form-item prop="ecrType" :label="$t('pcn.form.ChangeType')">
                   <el-select style="width: 100%" v-model="tmp.ecrType" placeholder="请选择">
                     <el-option
@@ -22,8 +22,8 @@
                 <el-form-item prop="name" :label="$t('pcn.form.Name')">
                   <el-input v-model="tmp.name"></el-input>
                 </el-form-item>
-                <el-form-item prop="LQ_PROJECT" :label="$t('pcn.form.project')">
-                  <el-input v-model="tmp.LQ_PROJECT"></el-input>
+                <el-form-item  v-show="false" prop="LQ_PROJECT" :label="$t('pcn.form.project')">
+                  <el-input  v-model="tmp.LQ_PROJECT"></el-input>
                 </el-form-item>
                 <el-form-item prop="sourceEngineerName" :label="$t('pcn.form.ResourceEngineer')">
                   <el-input v-model="tmp.sourceEngineerName" readonly="true">
@@ -45,17 +45,17 @@
               </el-col>
             </el-row>
             <div class="longcheer_hr" style="margin-left: -20px">
-              <span class="longcheer_hr_span">文件</span>
+              <span class="longcheer_hr_span">{{$t('supplement.fengyang.file')}}</span>
             </div>
             <el-button-group style="margin-top: 10px">
-              <el-button size="mini" :loading="$store.getters.loading" icon="el-icon-plus" @click="filesUploadClick">上传文件</el-button>
+              <el-button size="mini" :loading="$store.getters.loading" icon="el-icon-plus" @click="filesUploadClick">{{$t('supplement.fengyang.UploadFiles')}}</el-button>
               <el-button size="mini" :loading="$store.getters.loading" icon="el-icon-delete" @click="removeRelatedWLFYDocs">{{$t('fengyangTable.detail.remove')}}</el-button>
               <el-table
                 size="mini"
                 :data="filesList"
                 border
                 ref="multipleTable"
-                height="200px"
+                :height="filesList.length === 0 ? '100': '200'"
                 @selection-change="handleSelectionChange"
                 style="width: 100%">
                 <el-table-column
@@ -63,7 +63,7 @@
                   type="selection"
                   width="55">
                 </el-table-column>
-                <el-table-column   align="center" :show-overflow-tooltip="true"   prop="number"  label="标签或文件名" width="650">
+                <el-table-column   align="center" :show-overflow-tooltip="true"   prop="number"  :label="$t('supplement.fengyang.LabelOrFilename')" width="650">
                   <template
                     slot-scope="scope">
                     {{$t(scope.row.name)}}
@@ -123,7 +123,7 @@ export default {
     },
     filesUploadClick () {
       this.$refs.fup.openDialog()
-      this.$refs.fup.setAttribute('http://172.16.9.169:8080/files/upLoad', [], '', 'fileList', {number: this.materialNumber, userName: this.$store.getters.userInfo.username})
+      this.$refs.fup.setAttribute(this.$store.state.filePath + '/files/upLoad', [], '', 'fileList', {number: new Date().getTime(), userName: this.$store.getters.userInfo.username})
     },
     escapeClick: function () {
       this.$refs.dialogRef.openDialog()
@@ -135,7 +135,7 @@ export default {
       console.log('xxoo', data)
       var that = this
       data.forEach(function (value, index) {
-        var path = value.response.data[0]
+        var path = value.path
         that.filesList.push({name: value.name, filepath: path, url: '', desc: '', ftype: 'new'})
       })
       this.$refs.fup.closeDialog()
@@ -174,6 +174,7 @@ export default {
                 duration: 5 * 1000
               })
               this.tmp = {ecrType: '', sourceEngineerName: ''}
+              this.filesList = []
               this.$refs['form1'].clearValidate()
             } else {
               this.$message({
@@ -234,8 +235,8 @@ export default {
     background-image: url(../../assets/image/tab2.png);
     background-repeat: no-repeat;
     background-size: 95% 100%;
-    width: 120px;
-    padding: 5px 15px;
+    padding: 5px 30px 0px 15px;
+    width: auto;
     height: 27px;
     color: #ffffff;
   }
